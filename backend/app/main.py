@@ -586,13 +586,20 @@ async def get_stock_profile(symbol: str):
             print(f"[ERROR] No info found for {symbol}")
             raise HTTPException(status_code=404, detail=f"No data found for symbol {symbol}")
         
+        # Patch website/weburl to always start with http(s)://
+        raw_website = info.get('website', '')
+        if raw_website and not raw_website.startswith(('http://', 'https://')):
+            safe_website = 'https://' + raw_website
+        else:
+            safe_website = raw_website
         profile_data = {
             "symbol": symbol,
             "name": info.get('longName', info.get('shortName', symbol)),
             "description": info.get('longBusinessSummary', ''),
             "sector": info.get('sector', ''),
             "industry": info.get('industry', ''),
-            "website": info.get('website', ''),
+            "website": safe_website,
+            "weburl": safe_website,
             "employees": int(info.get('fullTimeEmployees', 0)),
             "country": info.get('country', ''),
             "city": info.get('city', ''),
@@ -600,6 +607,8 @@ async def get_stock_profile(symbol: str):
             "address": info.get('address1', ''),
             "phone": info.get('phone', ''),
             "marketCap": float(info.get('marketCap', 0)),
+            "marketCapitalization": float(info.get('marketCap', 0)),
+            "shareOutstanding": float(info.get('sharesOutstanding', 0)),
             "currency": info.get('currency', 'USD'),
             "exchange": info.get('exchange', ''),
             "ipoDate": info.get('firstTradeDateEpochUtc', ''),
