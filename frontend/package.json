@@ -1,0 +1,91 @@
+{
+  "name": "marketseer-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/system": "^2.6.2",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@heroicons/react": "^2.0.18",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/lodash": "^4.17.17",
+    "@types/node": "^16.18.80",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "assert": "^2.1.0",
+    "axios": "^1.6.7",
+    "buffer": "^6.0.3",
+    "chart.js": "^4.2.1",
+    "crypto-browserify": "^3.12.0",
+    "framer-motion": "^11.0.3",
+    "lodash": "^4.17.21",
+    "path-browserify": "^1.0.1",
+    "plotly.js": "^2.29.1",
+    "process": "0.11.10",
+    "react": "18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^6.22.0",
+    "react-scripts": "5.0.1",
+    "stream-browserify": "^3.0.0",
+    "tailwindcss": "^3.2.7",
+    "typescript": "^4.9.5",
+    "util": "^0.12.5",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject",
+    "clean": "rm -rf node_modules",
+    "install-deps": "npm install",
+    "clean-install": "npm run clean && npm run install-deps",
+    "clean-start": "npm run clean-install && npm start",
+    "reset": "rm -rf node_modules package-lock.json && npm cache clean --force && npm install && npm start",
+    "full-reset": "rm -rf node_modules package-lock.json && npm cache clean --force && npm install process@0.11.10 --save-exact && npm install && npm start"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-class-properties": "^7.27.1",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.27.1",
+    "@babel/plugin-transform-numeric-separator": "^7.27.1",
+    "@babel/plugin-transform-optional-chaining": "^7.27.1",
+    "@babel/plugin-transform-private-methods": "^7.27.1",
+    "@babel/plugin-transform-private-property-in-object": "^7.27.1",
+    "@types/plotly.js": "^2.12.25",
+    "customize-cra": "^1.0.0",
+    "react-app-rewired": "^2.2.1"
+  },
+  "babel": {
+    "plugins": [
+      "@babel/plugin-transform-class-properties",
+      "@babel/plugin-transform-private-methods",
+      "@babel/plugin-transform-numeric-separator",
+      "@babel/plugin-transform-nullish-coalescing-operator",
+      "@babel/plugin-transform-optional-chaining",
+      "@babel/plugin-transform-private-property-in-object"
+    ]
+  }
+}
