@@ -327,7 +327,7 @@ const StockDetails: React.FC = () => {
               }} 
               gap={{ base: 4, md: 6 }}
             >
-              {/* Company info grid items */}
+              {/* Market Cap */}
               <GridItem>
                 <Box 
                   p={{ base: 4, md: 6 }} 
@@ -347,6 +347,7 @@ const StockDetails: React.FC = () => {
                 </Box>
               </GridItem>
 
+              {/* Shares Outstanding */}
               <GridItem>
                 <Box 
                   p={{ base: 4, md: 6 }} 
@@ -363,6 +364,7 @@ const StockDetails: React.FC = () => {
                 </Box>
               </GridItem>
 
+              {/* Website */}
               <GridItem colSpan={{ base: 1, sm: 2 }}>
                 <Box 
                   p={{ base: 4, md: 6 }} 
@@ -390,144 +392,6 @@ const StockDetails: React.FC = () => {
                   </Text>
                 </Box>
               </GridItem>
-
-              {companyProfile?.description && (
-                <GridItem colSpan={{ base: 1, sm: 2 }}>
-                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
-                    <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Description</Text>
-                    <Text color={textColor}>{companyProfile.description}</Text>
-                  </Box>
-                </GridItem>
-              )}
-
-              <GridItem>
-                <Box 
-                  p={{ base: 4, md: 6 }} 
-                  bg={bgColor} 
-                  borderRadius="lg" 
-                  borderWidth="1px" 
-                  borderColor={borderColor}
-                  height="100%"
-                >
-                  <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Sector</Text>
-                  <Text color={textColor}>{companyProfile?.sector || companyProfile?.finnhubIndustry || 'N/A'}</Text>
-                </Box>
-              </GridItem>
-
-              <GridItem>
-                <Box 
-                  p={{ base: 4, md: 6 }} 
-                  bg={bgColor} 
-                  borderRadius="lg" 
-                  borderWidth="1px" 
-                  borderColor={borderColor}
-                  height="100%"
-                >
-                  <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Industry</Text>
-                  <Text color={textColor}>{companyProfile?.industry || 'N/A'}</Text>
-                </Box>
-              </GridItem>
-
-              <GridItem>
-                <Box 
-                  p={{ base: 4, md: 6 }} 
-                  bg={bgColor} 
-                  borderRadius="lg" 
-                  borderWidth="1px" 
-                  borderColor={borderColor}
-                  height="100%"
-                >
-                  <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Employees</Text>
-                  <Text color={textColor}>{companyProfile?.employees || 'N/A'}</Text>
-                </Box>
-              </GridItem>
-
-              <GridItem>
-                <Box 
-                  p={{ base: 4, md: 6 }} 
-                  bg={bgColor} 
-                  borderRadius="lg" 
-                  borderWidth="1px" 
-                  borderColor={borderColor}
-                  height="100%"
-                >
-                  <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Location</Text>
-                  <Text color={textColor}>{[companyProfile?.city, companyProfile?.state, companyProfile?.country].filter(Boolean).join(', ') || 'N/A'}</Text>
-                </Box>
-              </GridItem>
-
-              {companyProfile?.address && (
-                <GridItem colSpan={{ base: 1, sm: 2 }}>
-                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
-                    <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Address</Text>
-                    <Text color={textColor}>{companyProfile.address}</Text>
-                  </Box>
-                </GridItem>
-              )}
-
-              {companyProfile?.phone && (
-                <GridItem colSpan={{ base: 1, sm: 2 }}>
-                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
-                    <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Phone</Text>
-                    <Text color={textColor}>{companyProfile.phone}</Text>
-                  </Box>
-                </GridItem>
-              )}
-
-              <GridItem>
-                <Box 
-                  p={{ base: 4, md: 6 }} 
-                  bg={bgColor} 
-                  borderRadius="lg" 
-                  borderWidth="1px" 
-                  borderColor={borderColor}
-                  height="100%"
-                >
-                  <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Currency</Text>
-                  <Text color={textColor}>{companyProfile?.currency || 'N/A'}</Text>
-                </Box>
-              </GridItem>
-
-              <GridItem>
-                <Box 
-                  p={{ base: 4, md: 6 }} 
-                  bg={bgColor} 
-                  borderRadius="lg" 
-                  borderWidth="1px" 
-                  borderColor={borderColor}
-                  height="100%"
-                >
-                  <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Exchange</Text>
-                  <Text color={textColor}>{companyProfile?.exchange || 'N/A'}</Text>
-                </Box>
-              </GridItem>
-
-              {companyProfile?.ipoDate && (
-                <GridItem colSpan={{ base: 1, sm: 2 }}>
-                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
-                    <Text fontWeight="bold" color={secondaryTextColor} mb={2}>IPO Date</Text>
-                    <Text color={textColor}>{companyProfile.ipoDate}</Text>
-                  </Box>
-                </GridItem>
-              )}
-
-              {companyProfile?.ceo && (
-                <GridItem colSpan={{ base: 1, sm: 2 }}>
-                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
-                    <Text fontWeight="bold" color={secondaryTextColor} mb={2}>CEO</Text>
-                    <Text color={textColor}>{companyProfile.ceo}</Text>
-                  </Box>
-                </GridItem>
-              )}
-
-              {companyProfile?.boardMembers && companyProfile.boardMembers.length > 0 && (
-                <GridItem colSpan={{ base: 1, sm: 2 }}>
-                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
-                    <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Board Members</Text>
-                    <Text color={textColor}>{companyProfile.boardMembers.join(', ')}</Text>
-                  </Box>
-                </GridItem>
-              )}
             </Grid>
           </Box>
 
