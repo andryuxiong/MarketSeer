@@ -24,7 +24,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Spinner, Box, Text } from '@chakra-ui/react';
+import { Spinner, Box, Text, SimpleGrid } from '@chakra-ui/react';
 import { API_BASE, formatApiUrl } from '../config/api';
 
 ChartJS.register(
@@ -110,7 +110,7 @@ const StockChart = ({ symbol }) => {
             const predData = await altPredResponse.json();
             handlePredictionData(predData);
           } else {
-            const predData = await predResponse.json();
+          const predData = await predResponse.json();
             handlePredictionData(predData);
           }
         };
@@ -195,18 +195,40 @@ const StockChart = ({ symbol }) => {
    */
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          boxWidth: 12,
+          padding: 15,
+          font: {
+            size: window.innerWidth < 768 ? 10 : 12
+          }
+        }
       },
       title: {
         display: true,
         text: `${symbol} Stock Price History and Prediction`,
+        font: {
+          size: window.innerWidth < 768 ? 14 : 16
+        },
+        padding: {
+          top: 10,
+          bottom: 20
+        }
       },
       tooltip: {
         mode: 'index',
-        intersect: false,  // Show tooltip for all datasets at the same x position
-      },
+        intersect: false,
+        padding: 10,
+        titleFont: {
+          size: window.innerWidth < 768 ? 12 : 14
+        },
+        bodyFont: {
+          size: window.innerWidth < 768 ? 11 : 13
+        }
+      }
     },
     scales: {
       x: {
@@ -214,38 +236,82 @@ const StockChart = ({ symbol }) => {
         title: {
           display: true,
           text: 'Date',
+          font: {
+            size: window.innerWidth < 768 ? 11 : 13
+          }
         },
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45,
+          font: {
+            size: window.innerWidth < 768 ? 10 : 12
+          }
+        }
       },
       y: {
         display: true,
         title: {
           display: true,
           text: 'Price',
+          font: {
+            size: window.innerWidth < 768 ? 11 : 13
+          }
         },
-      },
+        ticks: {
+          font: {
+            size: window.innerWidth < 768 ? 10 : 12
+          }
+        }
+      }
     },
     interaction: {
       mode: 'nearest',
       axis: 'x',
-      intersect: false,  // Show tooltip for nearest point on x-axis
-    },
+      intersect: false
+    }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4">
-      {/* Chart container with fixed height */}
-      <div className="h-[500px]">
+    <Box 
+      bg="white" 
+      borderRadius="lg" 
+      boxShadow="lg" 
+      p={{ base: 2, md: 4 }}
+      width="100%"
+    >
+      {/* Chart container with responsive height */}
+      <Box 
+        height={{ base: "300px", sm: "400px", md: "500px" }}
+        width="100%"
+        position="relative"
+      >
         <Line data={chartData} options={options} />
-      </div>
+      </Box>
+      
       {/* Additional information display */}
-      <div className="mt-4 text-sm text-gray-600">
-        <p>Current Price: ${predictionData.current_price.toFixed(2)}</p>
-        <p>Prediction Confidence: {(predictionData.confidence * 100).toFixed(1)}%</p>
+      <SimpleGrid 
+        columns={{ base: 1, sm: 2, md: 3 }} 
+        spacing={4} 
+        mt={4}
+        fontSize={{ base: "sm", md: "md" }}
+        color="gray.600"
+      >
+        <Box>
+          <Text fontWeight="semibold">Current Price</Text>
+          <Text>${predictionData.current_price.toFixed(2)}</Text>
+        </Box>
+        <Box>
+          <Text fontWeight="semibold">Prediction Confidence</Text>
+          <Text>{(predictionData.confidence * 100).toFixed(1)}%</Text>
+        </Box>
         {predictionData.model && (
-          <p>Model Used: <span className="font-semibold">{predictionData.model}</span></p>
+          <Box>
+            <Text fontWeight="semibold">Model Used</Text>
+            <Text>{predictionData.model}</Text>
+          </Box>
         )}
-      </div>
-    </div>
+      </SimpleGrid>
+    </Box>
   );
 };
 

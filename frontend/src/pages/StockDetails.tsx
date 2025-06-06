@@ -198,35 +198,39 @@ const StockDetails: React.FC = () => {
   const priceColor = isPositive ? positiveColor : negativeColor;
 
   return (
-    <Box bg={bgColor} minH="100vh" py={8}>
-      <Container maxW="container.xl">
-        <VStack spacing={8} align="stretch">
-          {/* Header Section with Gradient and readable title */}
-          <Box 
-            p={8} 
-            bgGradient="linear(to-r, blue.700, purple.700)"
-            borderRadius="xl" 
-            boxShadow={shadow}
-            borderWidth="1px" 
-            borderColor={borderColor}
-            color={textColor}
-          >
-            <VStack align="start" spacing={2}>
-              <Heading size="2xl" color={textColor} textShadow="0 2px 8px rgba(0,0,0,0.5)">{companyProfile?.name}</Heading>
-              <HStack>
-                <Badge fontSize="lg" px={3} py={1} borderRadius="full" bg={accentColor} color="white">
-                  {symbol}
-                </Badge>
-                <Text fontSize="lg" opacity={0.9} color={secondaryTextColor}>{companyProfile?.finnhubIndustry}</Text>
-              </HStack>
-            </VStack>
+    <Box bg={bgColor} minH="100vh">
+      <Container maxW="container.xl" py={{ base: 4, md: 8 }}>
+        <VStack spacing={{ base: 4, md: 8 }} align="stretch">
+          {/* Stock Header */}
+          <Box>
+            <Heading 
+              size={{ base: "lg", md: "xl" }} 
+              mb={2} 
+              color={textColor}
+              textAlign={{ base: "center", md: "left" }}
+            >
+              {companyProfile?.name || symbol}
+            </Heading>
+            <Text 
+              color={secondaryTextColor}
+              textAlign={{ base: "center", md: "left" }}
+            >
+              {companyProfile?.sector} • {companyProfile?.industry}
+            </Text>
           </Box>
 
-          {/* Price and Stats Section */}
-          <Grid templateColumns={{ base: "1fr", md: "repeat(4, 1fr)" }} gap={6}>
-            <GridItem colSpan={{ base: 1, md: 2 }}>
+          {/* Price and Stats Grid */}
+          <Grid 
+            templateColumns={{ 
+              base: "1fr", 
+              sm: "repeat(2, 1fr)", 
+              md: "repeat(4, 1fr)" 
+            }} 
+            gap={{ base: 4, md: 6 }}
+          >
+            <GridItem colSpan={{ base: 1, sm: 2, md: 2 }}>
               <Box 
-                p={6} 
+                p={{ base: 4, md: 6 }} 
                 bg={cardBgColor} 
                 borderRadius="xl" 
                 boxShadow={shadow} 
@@ -238,52 +242,61 @@ const StockDetails: React.FC = () => {
                 <Box position="absolute" top={0} right={0} p={4}>
                   <Icon 
                     as={isPositive ? ChevronUpIcon : ChevronDownIcon} 
-                    w={8} 
-                    h={8} 
+                    w={{ base: 6, md: 8 }} 
+                    h={{ base: 6, md: 8 }} 
                     color={priceColor}
                   />
                 </Box>
                 <Stat>
-                  <StatLabel color={secondaryTextColor} fontSize="lg">Current Price</StatLabel>
-                  <StatNumber fontSize="4xl" color={priceColor}>
+                  <StatLabel color={secondaryTextColor} fontSize={{ base: "md", md: "lg" }}>
+                    Current Price
+                  </StatLabel>
+                  <StatNumber fontSize={{ base: "3xl", md: "4xl" }} color={priceColor}>
                     ${stockData?.c.toFixed(2)}
                   </StatNumber>
-                  <StatHelpText fontSize="lg" color={priceColor}>
+                  <StatHelpText fontSize={{ base: "md", md: "lg" }} color={priceColor}>
                     <StatArrow type={isPositive ? 'increase' : 'decrease'} />
                     {stockData?.d?.toFixed(2)} ({stockData?.dp?.toFixed(2)}%)
                   </StatHelpText>
                 </Stat>
               </Box>
             </GridItem>
+
+            {/* Other stats cards */}
             <GridItem>
               <Box 
-                p={6} 
+                p={{ base: 4, md: 6 }} 
                 bg={cardBgColor} 
                 borderRadius="xl" 
                 boxShadow={shadow} 
                 borderWidth="1px" 
                 borderColor={borderColor}
+                height="100%"
               >
-                <Text fontSize="2xl" color={accentColor} mb={2}>$</Text>
+                <Text fontSize={{ base: "xl", md: "2xl" }} color={accentColor} mb={2}>$</Text>
                 <Stat>
                   <StatLabel color={secondaryTextColor}>Open</StatLabel>
-                  <StatNumber fontSize="2xl" color={textColor}>${stockData?.o.toFixed(2)}</StatNumber>
+                  <StatNumber fontSize={{ base: "xl", md: "2xl" }} color={textColor}>
+                    ${stockData?.o.toFixed(2)}
+                  </StatNumber>
                 </Stat>
               </Box>
             </GridItem>
+
             <GridItem>
               <Box 
-                p={6} 
+                p={{ base: 4, md: 6 }} 
                 bg={cardBgColor} 
                 borderRadius="xl" 
                 boxShadow={shadow} 
                 borderWidth="1px" 
                 borderColor={borderColor}
+                height="100%"
               >
-                <Text fontSize="2xl" color={accentColor} mb={2}>📊</Text>
+                <Text fontSize={{ base: "xl", md: "2xl" }} color={accentColor} mb={2}>📊</Text>
                 <Stat>
                   <StatLabel color={secondaryTextColor}>High/Low</StatLabel>
-                  <StatNumber fontSize="2xl" color={textColor}>
+                  <StatNumber fontSize={{ base: "xl", md: "2xl" }} color={textColor}>
                     ${stockData?.h.toFixed(2)} / ${stockData?.l.toFixed(2)}
                   </StatNumber>
                 </Stat>
@@ -293,50 +306,71 @@ const StockDetails: React.FC = () => {
 
           {/* Company Info Section */}
           <Box 
-            p={8} 
+            p={{ base: 4, md: 8 }} 
             bg={cardBgColor} 
             borderRadius="xl" 
             boxShadow={shadow} 
             borderWidth="1px" 
             borderColor={borderColor}
           >
-            <Heading size="lg" mb={6} color={textColor} textShadow="0 2px 8px rgba(0,0,0,0.5)">Company Information</Heading>
-            <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
+            <Heading 
+              size={{ base: "md", md: "lg" }} 
+              mb={{ base: 4, md: 6 }} 
+              color={textColor}
+            >
+              Company Information
+            </Heading>
+            <Grid 
+              templateColumns={{ 
+                base: "1fr", 
+                sm: "repeat(2, 1fr)" 
+              }} 
+              gap={{ base: 4, md: 6 }}
+            >
+              {/* Company info grid items */}
               <GridItem>
                 <Box 
-                  p={6} 
+                  p={{ base: 4, md: 6 }} 
                   bg={bgColor} 
                   borderRadius="lg" 
                   borderWidth="1px" 
                   borderColor={borderColor}
+                  height="100%"
                 >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Market Cap</Text>
-                  <Text fontSize="2xl" color={textColor}>
-                    {companyProfile?.marketCapitalization ? `$${(companyProfile.marketCapitalization / 1e9).toFixed(2)}B` : 'N/A'}
+                  <Text fontSize={{ base: "xl", md: "2xl" }} color={textColor}>
+                    {companyProfile?.marketCapitalization ? 
+                      `$${(companyProfile.marketCapitalization / 1e9).toFixed(2)}B` : 
+                      'N/A'
+                    }
                   </Text>
                 </Box>
               </GridItem>
+
               <GridItem>
                 <Box 
-                  p={6} 
+                  p={{ base: 4, md: 6 }} 
                   bg={bgColor} 
                   borderRadius="lg" 
                   borderWidth="1px" 
                   borderColor={borderColor}
+                  height="100%"
                 >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Shares Outstanding</Text>
-                  <Text fontSize="2xl" color={textColor}>
+                  <Text fontSize={{ base: "xl", md: "2xl" }} color={textColor}>
                     {companyProfile?.shareOutstanding ? `${(companyProfile.shareOutstanding / 1e6).toFixed(2)}M` : 'N/A'}
                   </Text>
                 </Box>
               </GridItem>
-              <GridItem colSpan={{ base: 1, md: 2 }}>
+
+              <GridItem colSpan={{ base: 1, sm: 2 }}>
                 <Box 
-                  p={6} 
+                  p={{ base: 4, md: 6 }} 
                   bg={bgColor} 
                   borderRadius="lg" 
                   borderWidth="1px" 
                   borderColor={borderColor}
+                  height="100%"
                 >
                   <HStack spacing={3} mb={2}>
                     <Icon as={LinkIcon} w={5} h={5} color={accentColor} />
@@ -346,7 +380,7 @@ const StockDetails: React.FC = () => {
                     as="a" 
                     href={companyProfile?.weburl} 
                     color={accentColor} 
-                    fontSize="xl" 
+                    fontSize={{ base: "xl", md: "2xl" }} 
                     _hover={{ textDecoration: 'underline' }}
                     mt={2}
                     target="_blank"
@@ -356,85 +390,139 @@ const StockDetails: React.FC = () => {
                   </Text>
                 </Box>
               </GridItem>
+
               {companyProfile?.description && (
-                <GridItem colSpan={2}>
-                  <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <GridItem colSpan={{ base: 1, sm: 2 }}>
+                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
                     <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Description</Text>
                     <Text color={textColor}>{companyProfile.description}</Text>
                   </Box>
                 </GridItem>
               )}
+
               <GridItem>
-                <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box 
+                  p={{ base: 4, md: 6 }} 
+                  bg={bgColor} 
+                  borderRadius="lg" 
+                  borderWidth="1px" 
+                  borderColor={borderColor}
+                  height="100%"
+                >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Sector</Text>
                   <Text color={textColor}>{companyProfile?.sector || companyProfile?.finnhubIndustry || 'N/A'}</Text>
                 </Box>
               </GridItem>
+
               <GridItem>
-                <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box 
+                  p={{ base: 4, md: 6 }} 
+                  bg={bgColor} 
+                  borderRadius="lg" 
+                  borderWidth="1px" 
+                  borderColor={borderColor}
+                  height="100%"
+                >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Industry</Text>
                   <Text color={textColor}>{companyProfile?.industry || 'N/A'}</Text>
                 </Box>
               </GridItem>
+
               <GridItem>
-                <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box 
+                  p={{ base: 4, md: 6 }} 
+                  bg={bgColor} 
+                  borderRadius="lg" 
+                  borderWidth="1px" 
+                  borderColor={borderColor}
+                  height="100%"
+                >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Employees</Text>
                   <Text color={textColor}>{companyProfile?.employees || 'N/A'}</Text>
                 </Box>
               </GridItem>
+
               <GridItem>
-                <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box 
+                  p={{ base: 4, md: 6 }} 
+                  bg={bgColor} 
+                  borderRadius="lg" 
+                  borderWidth="1px" 
+                  borderColor={borderColor}
+                  height="100%"
+                >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Location</Text>
                   <Text color={textColor}>{[companyProfile?.city, companyProfile?.state, companyProfile?.country].filter(Boolean).join(', ') || 'N/A'}</Text>
                 </Box>
               </GridItem>
+
               {companyProfile?.address && (
-                <GridItem colSpan={2}>
-                  <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <GridItem colSpan={{ base: 1, sm: 2 }}>
+                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
                     <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Address</Text>
                     <Text color={textColor}>{companyProfile.address}</Text>
                   </Box>
                 </GridItem>
               )}
+
               {companyProfile?.phone && (
-                <GridItem colSpan={2}>
-                  <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <GridItem colSpan={{ base: 1, sm: 2 }}>
+                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
                     <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Phone</Text>
                     <Text color={textColor}>{companyProfile.phone}</Text>
                   </Box>
                 </GridItem>
               )}
+
               <GridItem>
-                <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box 
+                  p={{ base: 4, md: 6 }} 
+                  bg={bgColor} 
+                  borderRadius="lg" 
+                  borderWidth="1px" 
+                  borderColor={borderColor}
+                  height="100%"
+                >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Currency</Text>
                   <Text color={textColor}>{companyProfile?.currency || 'N/A'}</Text>
                 </Box>
               </GridItem>
+
               <GridItem>
-                <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box 
+                  p={{ base: 4, md: 6 }} 
+                  bg={bgColor} 
+                  borderRadius="lg" 
+                  borderWidth="1px" 
+                  borderColor={borderColor}
+                  height="100%"
+                >
                   <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Exchange</Text>
                   <Text color={textColor}>{companyProfile?.exchange || 'N/A'}</Text>
                 </Box>
               </GridItem>
+
               {companyProfile?.ipoDate && (
-                <GridItem colSpan={2}>
-                  <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <GridItem colSpan={{ base: 1, sm: 2 }}>
+                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
                     <Text fontWeight="bold" color={secondaryTextColor} mb={2}>IPO Date</Text>
                     <Text color={textColor}>{companyProfile.ipoDate}</Text>
                   </Box>
                 </GridItem>
               )}
+
               {companyProfile?.ceo && (
-                <GridItem colSpan={2}>
-                  <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <GridItem colSpan={{ base: 1, sm: 2 }}>
+                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
                     <Text fontWeight="bold" color={secondaryTextColor} mb={2}>CEO</Text>
                     <Text color={textColor}>{companyProfile.ceo}</Text>
                   </Box>
                 </GridItem>
               )}
+
               {companyProfile?.boardMembers && companyProfile.boardMembers.length > 0 && (
-                <GridItem colSpan={2}>
-                  <Box p={6} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <GridItem colSpan={{ base: 1, sm: 2 }}>
+                  <Box p={{ base: 4, md: 6 }} bg={bgColor} borderRadius="lg" borderWidth="1px" borderColor={borderColor} height="100%">
                     <Text fontWeight="bold" color={secondaryTextColor} mb={2}>Board Members</Text>
                     <Text color={textColor}>{companyProfile.boardMembers.join(', ')}</Text>
                   </Box>
@@ -443,12 +531,31 @@ const StockDetails: React.FC = () => {
             </Grid>
           </Box>
 
-          {/* Chart and Predictions Panel */}
-          <Box className="mt-8">
+          {/* Chart Section */}
+          <Box 
+            mt={{ base: 4, md: 8 }}
+            p={{ base: 4, md: 6 }}
+            bg={cardBgColor}
+            borderRadius="xl"
+            boxShadow={shadow}
+            borderWidth="1px"
+            borderColor={borderColor}
+          >
             <StockChart symbol={symbol} />
           </Box>
+
           {/* News Section */}
-          <StockNews symbol={(symbol ?? '')} />
+          <Box 
+            mt={{ base: 4, md: 8 }}
+            p={{ base: 4, md: 6 }}
+            bg={cardBgColor}
+            borderRadius="xl"
+            boxShadow={shadow}
+            borderWidth="1px"
+            borderColor={borderColor}
+          >
+            <StockNews symbol={symbol ?? ''} />
+          </Box>
         </VStack>
       </Container>
     </Box>

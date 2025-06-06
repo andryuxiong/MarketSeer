@@ -38,13 +38,13 @@ const StockChart: React.FC<StockChartProps> = ({ symbol, timeframe, height = 350
           console.log('Primary historical data endpoint failed, trying alternative...');
           response = await fetch(formatApiUrl(`/api/stock/historical/${symbol}`));
           
-          if (!response.ok) {
-            if (response.status === 404) {
-              setError(`No data available for ${symbol}. Please try a different symbol.`);
-              return;
-            }
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError(`No data available for ${symbol}. Please try a different symbol.`);
+            return;
           }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         }
 
         const historicalData = await response.json();
