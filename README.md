@@ -21,7 +21,7 @@ marketseer/
 - The [frontend](./frontend/README.md) handles the user interface and data visualization.
 - The [backend](./backend/README.md) provides the REST API, data analysis, and portfolio logic.
 
-## Getting Started
+## Getting Startedbhn
 
 ### Prerequisites
 
