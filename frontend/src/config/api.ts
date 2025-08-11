@@ -79,7 +79,7 @@ export const formatApiUrl = (endpoint: string) => {
 export const API_ENDPOINTS = {
   // Stock endpoints
   STOCK: {
-    QUOTE: (symbol: string) => `/api/stock/quote/${symbol}`,
+    QUOTE: (symbol: string) => `/api/stocks/quote/${symbol}`,           // Enhanced quote
     PROFILE: (symbol: string) => `/api/stock/profile/${symbol}`,
     HISTORICAL: (symbol: string) => `/api/stock/historical/${symbol}`,
     PREDICT: (symbol: string) => `/api/stock/predict/${symbol}`,
@@ -144,6 +144,18 @@ export const apiClient = {
   delete: async <T>(endpoint: string, toast = defaultToast) => {
     try {
       const response = await api.delete<T>(endpoint);
+      return response.data;
+    } catch (error: unknown) {
+      handleApiError(error as ApiError, toast);
+      throw error;
+    }
+  },
+
+  // Enhanced API method for better stock quotes
+  getEnhancedQuote: async (symbol: string, forceRefresh = false, toast = defaultToast) => {
+    try {
+      const params = forceRefresh ? { force_refresh: true } : {};
+      const response = await api.get(API_ENDPOINTS.STOCK.QUOTE(symbol), { params });
       return response.data;
     } catch (error: unknown) {
       handleApiError(error as ApiError, toast);

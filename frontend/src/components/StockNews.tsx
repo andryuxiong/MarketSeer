@@ -278,7 +278,7 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
       </Text>
     </Box>
   );
-  if (news.length === 0) return (
+  if (!news.length) return (
     <Box mt={8}>
       <Heading size="md" mb={4}>Latest News & Sentiment</Heading>
       <Text p={4} borderWidth="1px" borderRadius="lg">

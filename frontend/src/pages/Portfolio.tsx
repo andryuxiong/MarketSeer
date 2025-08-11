@@ -14,7 +14,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { getPortfolioValueHistory, cleanPortfolioValueHistory } from '../utils/portfolio';
+import { getPortfolioValueHistory, cleanPortfolioValueHistory, PortfolioValuePoint } from '../utils/portfolio';
 import type { Chart, ChartTypeRegistry, ScriptableContext, ScriptableLineSegmentContext } from 'chart.js';
 import { formatApiUrl } from '../config/api';
 
@@ -37,6 +37,8 @@ const PortfolioPage: React.FC = () => {
   const [action, setAction] = useState<'buy' | 'sell'>('buy');
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState<number | null>(null);
+  const [valueHistory, setValueHistory] = useState<PortfolioValuePoint[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
   const toast = useToast();
   const [isResetOpen, setIsResetOpen] = useState(false);
   const cancelRef = React.useRef<HTMLButtonElement>(null);
@@ -46,10 +48,26 @@ const PortfolioPage: React.FC = () => {
   const cardBg = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'white');
 
+  // Load value history on component mount
+  useEffect(() => {
+    const loadValueHistory = async () => {
+      setHistoryLoading(true);
+      try {
+        const history = await getPortfolioValueHistory();
+        setValueHistory(cleanPortfolioValueHistory(history));
+      } catch (error) {
+        console.error('Failed to load value history:', error);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+    loadValueHistory();
+  }, [portfolio]); // Reload when portfolio changes
+
   // Fetch current price for the symbol
   const fetchPrice = async (symbol: string) => {
     try {
-      const res = await fetch(formatApiUrl(`/api/stock/quote/${symbol}`));
+      const res = await fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)); // Fixed endpoint
       if (!res.ok) throw new Error('Failed to fetch price');
       const data = await res.json();
       return data.c;
@@ -72,7 +90,7 @@ const PortfolioPage: React.FC = () => {
       return;
     }
     setPrice(latestPrice);
-    const result = tradeStock(action, symbol, shares, latestPrice);
+    const result = await tradeStock(action, symbol, shares, latestPrice);
     setPortfolio(getPortfolio());
     toast({ title: result.message, status: result.success ? 'success' : 'error' });
     setLoading(false);
@@ -100,7 +118,6 @@ const PortfolioPage: React.FC = () => {
 
   // --- Chart Data Preparation ---
   const STARTING_CASH = 100000;
-  const valueHistory = cleanPortfolioValueHistory(getPortfolioValueHistory());
 
   const valueLineData = {
     labels: valueHistory.map((pt) => new Date(pt.date).toLocaleDateString()),
@@ -316,8 +333,14 @@ const PortfolioPage: React.FC = () => {
           <VStack spacing={8} align="stretch">
             <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
               <Heading size="sm" mb={2}>Portfolio Value Over Time</Heading>
-              <Line data={valueLineData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={200} />
-                    </Box>
+              {historyLoading ? (
+                <Box textAlign="center" py={20}>
+                  <Text>Loading portfolio history...</Text>
+                </Box>
+              ) : (
+                <Line data={valueLineData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={200} />
+              )}
+            </Box>
             <HStack spacing={8} align="stretch" flexWrap="wrap">
               <Box flex={1} minW="250px" bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
                 <Heading size="sm" mb={2}>Asset Allocation</Heading>
@@ -339,7 +362,7 @@ const PortfolioPage: React.FC = () => {
 const AsyncPrice: React.FC<{ symbol: string; avgPrice: number }> = ({ symbol, avgPrice }) => {
   const [price, setPrice] = useState<number | null>(null);
   useEffect(() => {
-    fetch(formatApiUrl(`/api/stock/quote/${symbol}`))
+    fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)) // Fixed endpoint
       .then(res => res.json())
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));
@@ -350,7 +373,7 @@ const AsyncPrice: React.FC<{ symbol: string; avgPrice: number }> = ({ symbol, av
 const AsyncValue: React.FC<{ symbol: string; shares: number; avgPrice: number }> = ({ symbol, shares, avgPrice }) => {
   const [price, setPrice] = useState<number | null>(null);
   useEffect(() => {
-    fetch(formatApiUrl(`/api/stock/quote/${symbol}`))
+    fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)) // Fixed endpoint
       .then(res => res.json())
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));
@@ -362,7 +385,7 @@ const AsyncValue: React.FC<{ symbol: string; shares: number; avgPrice: number }>
 const AsyncGain: React.FC<{ symbol: string; shares: number; avgPrice: number }> = ({ symbol, shares, avgPrice }) => {
   const [price, setPrice] = useState<number | null>(null);
   useEffect(() => {
-    fetch(formatApiUrl(`/api/stock/quote/${symbol}`))
+    fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)) // Fixed endpoint
       .then(res => res.json())
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));

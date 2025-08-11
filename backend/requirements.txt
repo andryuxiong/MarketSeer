@@ -23,6 +23,7 @@ beautifulsoup4>=4.12.2
 aiohttp>=3.9.1
 requests>=2.31.0
 python-multipart>=0.0.6
+pytz>=2023.3  # For market hours timezone handling
 
 # NLP
 textblob>=0.17.1
