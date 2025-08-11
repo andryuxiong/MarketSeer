@@ -52,14 +52,33 @@ export function resetPortfolio() {
   localStorage.removeItem(VALUE_HISTORY_KEY);
 }
 
-// Helper to rebuild value history from trades
-export function rebuildPortfolioValueHistoryFromTrades(): PortfolioValuePoint[] {
+// Helper to rebuild value history from trades using CURRENT market prices
+export async function rebuildPortfolioValueHistoryFromTrades(): Promise<PortfolioValuePoint[]> {
   const portfolio = getPortfolio();
   const trades = [...portfolio.history].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   if (trades.length === 0) {
     // No trades, flat line at starting cash
     return [{ date: new Date().toISOString(), value: STARTING_CASH }];
   }
+
+  // Get current market prices for all symbols in portfolio
+  const allSymbols = Array.from(new Set(trades.map(t => t.symbol)));
+  const currentPrices: Record<string, number> = {};
+  
+  // Fetch current prices in parallel
+  await Promise.all(
+    allSymbols.map(async (symbol) => {
+      try {
+        const response = await fetch(formatApiUrl(`/api/stocks/quote/${symbol}`));
+        if (response.ok) {
+          const data = await response.json();
+          currentPrices[symbol] = data.c;
+        }
+      } catch (err) {
+        console.warn(`Could not fetch current price for ${symbol}, using average price`);
+      }
+    })
+  );
 
   let cash = STARTING_CASH;
   let holdings: Record<string, { shares: number; avg_price: number }> = {};
@@ -84,10 +103,12 @@ export function rebuildPortfolioValueHistoryFromTrades(): PortfolioValuePoint[] 
         cash += trade.shares * trade.price;
       }
     }
-    // Calculate value after this trade
+    
+    // Calculate value after this trade using CURRENT market prices
     let value = cash;
     for (const symbol in holdings) {
-      value += holdings[symbol].shares * holdings[symbol].avg_price;
+      const currentPrice = currentPrices[symbol] || holdings[symbol].avg_price;
+      value += holdings[symbol].shares * currentPrice;
     }
     valueHistory.push({ date: trade.date, value });
   }
@@ -95,7 +116,7 @@ export function rebuildPortfolioValueHistoryFromTrades(): PortfolioValuePoint[] 
 }
 
 
-export function getPortfolioValueHistory(): PortfolioValuePoint[] {
+export async function getPortfolioValueHistory(): Promise<PortfolioValuePoint[]> {
   const data = localStorage.getItem(VALUE_HISTORY_KEY);
   if (data) {
     const parsed = JSON.parse(data);
@@ -103,13 +124,13 @@ export function getPortfolioValueHistory(): PortfolioValuePoint[] {
       return parsed;
     }
   }
-  // If no value history, rebuild from trades
-  const rebuilt = rebuildPortfolioValueHistoryFromTrades();
+  // If no value history, rebuild from trades using current market prices
+  const rebuilt = await rebuildPortfolioValueHistoryFromTrades();
   localStorage.setItem(VALUE_HISTORY_KEY, JSON.stringify(rebuilt));
   return rebuilt;
 }
 
-export function recordPortfolioValueHistory(portfolio: Portfolio, latestPrices: Record<string, number>) {
+export async function recordPortfolioValueHistory(portfolio: Portfolio, latestPrices: Record<string, number>) {
   // Calculate total value: cash + sum of (shares * latest price)
   let total = portfolio.cash;
   for (const holding of portfolio.holdings) {
@@ -117,7 +138,7 @@ export function recordPortfolioValueHistory(portfolio: Portfolio, latestPrices: 
     total += holding.shares * price;
   }
   
-  const history = getPortfolioValueHistory();
+  const history = await getPortfolioValueHistory();
   const now = new Date();
   
   // Always record a new point when trading
@@ -143,7 +164,7 @@ export function updatePortfolioValueHistory() {
   Promise.all(
     portfolio.holdings.map(async (h) => {
       try {
-        const response = await fetch(formatApiUrl(`/api/stock/quote/${h.symbol}`));
+        const response = await fetch(formatApiUrl(`/api/stocks/quote/${h.symbol}`));
         if (!response.ok) throw new Error(`Failed to fetch price for ${h.symbol}`);
         const data = await response.json();
         return { symbol: h.symbol, price: data.c };
@@ -162,7 +183,7 @@ export function updatePortfolioValueHistory() {
   });
 }
 
-export function tradeStock(action: 'buy' | 'sell', symbol: string, shares: number, price: number): { success: boolean; message: string } {
+export async function tradeStock(action: 'buy' | 'sell', symbol: string, shares: number, price: number): Promise<{ success: boolean; message: string }> {
   const portfolio = getPortfolio();
   const now = new Date().toISOString();
   symbol = symbol.toUpperCase();
@@ -186,7 +207,7 @@ export function tradeStock(action: 'buy' | 'sell', symbol: string, shares: numbe
     portfolio.history.push({ date: now, action, symbol, shares, price });
     savePortfolio(portfolio);
     // Record value history
-    recordPortfolioValueHistory(portfolio, { [symbol]: price });
+    await recordPortfolioValueHistory(portfolio, { [symbol]: price });
     return { success: true, message: 'Stock bought successfully.' };
   } else if (action === 'sell') {
     const holding = portfolio.holdings.find(h => h.symbol === symbol);
@@ -201,7 +222,7 @@ export function tradeStock(action: 'buy' | 'sell', symbol: string, shares: numbe
     portfolio.history.push({ date: now, action, symbol, shares, price });
     savePortfolio(portfolio);
     // Record value history
-    recordPortfolioValueHistory(portfolio, { [symbol]: price });
+    await recordPortfolioValueHistory(portfolio, { [symbol]: price });
     return { success: true, message: 'Stock sold successfully.' };
   }
   return { success: false, message: 'Invalid action.' };
@@ -215,4 +236,9 @@ export function cleanPortfolioValueHistory(history: PortfolioValuePoint[]): Port
     if (idx === 0) return true;
     return pt.value !== arr[idx - 1].value || pt.date !== arr[idx - 1].date;
   });
+}
+
+// Force rebuild of portfolio value history with current market prices
+export function forceRebuildPortfolioHistory() {
+  localStorage.removeItem(VALUE_HISTORY_KEY);
 } 

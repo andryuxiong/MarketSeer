@@ -136,13 +136,13 @@ const StockDetails = () => {
               
               {/* Website Section */}
               {stockData.weburl && (
-              <div>
-                <p className="text-gray-600">Website</p>
-                <a href={stockData.weburl} target="_blank" rel="noopener noreferrer" 
-                   className="text-blue-500 hover:underline">
-                  {stockData.weburl}
-                </a>
-              </div>
+                <div>
+                  <p className="text-gray-600">Website</p>
+                  <a href={stockData.weburl} target="_blank" rel="noopener noreferrer" 
+                     className="text-blue-500 hover:underline">
+                    {stockData.weburl}
+                  </a>
+                </div>
               )}
             </div>
           </div>

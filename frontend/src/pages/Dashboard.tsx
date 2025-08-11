@@ -34,7 +34,7 @@ import { motion } from 'framer-motion';
 import { FiTrendingUp, FiTrendingDown, FiDollarSign, FiPercent, FiClock } from 'react-icons/fi';
 import { TimeIcon } from '@chakra-ui/icons';
 import StockChart from '../components/charts/StockChart';
-import { getPortfolio, getPortfolioValueHistory, updatePortfolioValueHistory, cleanPortfolioValueHistory } from '../utils/portfolio';
+import { getPortfolio, getPortfolioValueHistory, updatePortfolioValueHistory, cleanPortfolioValueHistory, PortfolioValuePoint } from '../utils/portfolio';
 import { Link } from 'react-router-dom';
 import { Line, Pie, Bar } from 'react-chartjs-2';
 import {
@@ -101,6 +101,9 @@ interface NewsItem {
 }
 
 const Dashboard: React.FC = () => {
+  const [portfolioHistory, setPortfolioHistory] = useState<PortfolioValuePoint[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  
   const cardBg = useColorModeValue('white', 'gray.800');
   const textColor = useColorModeValue('gray.800', 'white');
   const sectionTitleColor = useColorModeValue('blue.700', 'blue.200');
@@ -262,16 +265,30 @@ const Dashboard: React.FC = () => {
     ],
   };
 
+  // Load portfolio history
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const history = await getPortfolioValueHistory();
+        setPortfolioHistory(cleanPortfolioValueHistory(history));
+      } catch (error) {
+        console.error('Failed to load portfolio history:', error);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+    loadHistory();
+  }, []);
+
   // Portfolio value history for line chart
   const STARTING_CASH = 100000;
-  const valueHistory = cleanPortfolioValueHistory(getPortfolioValueHistory());
 
   const valueLineData = {
-    labels: valueHistory.map((pt) => new Date(pt.date).toLocaleDateString()),
+    labels: portfolioHistory.map((pt) => new Date(pt.date).toLocaleDateString()),
     datasets: [
       {
         label: 'Portfolio Value',
-        data: valueHistory.map((pt) => pt.value),
+        data: portfolioHistory.map((pt) => pt.value),
         borderColor: '#3182CE', // fallback color
         segment: {
           borderColor: (ctx: ScriptableLineSegmentContext) => {

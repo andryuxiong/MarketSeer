@@ -219,7 +219,20 @@ class LSTMService:
             self.currently_training.add(symbol)
             model_path, scaler_path, metrics_path = self.get_model_paths(symbol)
             hist = self.get_latest_data(symbol, period)
-            features = hist[["Open", "High", "Low", "Close", "Volume"]].values
+            
+            # Clean the data: remove NaN values and ensure all columns are present
+            hist_clean = hist[["Open", "High", "Low", "Close", "Volume"]].copy()
+            
+            # Drop rows with NaN values
+            hist_clean = hist_clean.dropna()
+            
+            if hist_clean.empty:
+                raise ValueError(f"No valid data found for {symbol} after cleaning")
+                
+            if len(hist_clean) < self.sequence_length + 10:
+                raise ValueError(f"Not enough data for {symbol}. Need at least {self.sequence_length + 10} days, got {len(hist_clean)}")
+            
+            features = hist_clean.values
             
             # Get the data ready
             X, y = self.prepare_data(features, self.sequence_length)
@@ -400,11 +413,30 @@ class LSTMService:
             sma = float(np.mean(close_prices[-window:]))
             last_date = hist.index[-1]
             prediction_dates = self.get_next_trading_days(last_date, days)
+            # Calculate confidence based on recent volatility
+            recent_prices = close_prices[-window:]
+            volatility = np.std(recent_prices) / np.mean(recent_prices)
+            # Lower volatility = higher confidence (capped between 0.3 and 0.7)
+            confidence = max(0.3, min(0.7, 0.7 - volatility))
+            
+            # Create more realistic predictions with slight trend and randomness
+            predictions = []
+            current_pred = sma
+            daily_change_avg = np.mean(np.diff(recent_prices[-10:])) if len(recent_prices) >= 10 else 0
+            daily_volatility = np.std(np.diff(recent_prices[-10:])) if len(recent_prices) >= 10 else volatility * sma * 0.1
+            
+            for i in range(days):
+                # Add slight trend continuation and small random variation
+                trend_component = daily_change_avg * 0.5  # Dampen the trend
+                random_component = np.random.normal(0, daily_volatility * 0.3)  # Small random walk
+                current_pred = max(current_pred + trend_component + random_component, last_price * 0.5)  # Don't go below 50% of current price
+                predictions.append(current_pred)
+            
             return {
                 "current_price": last_price,
-                "predicted_prices": [sma] * days,
+                "predicted_prices": predictions,
                 "prediction_dates": prediction_dates,
-                "confidence": 0.5,  # Lower confidence for simple model
+                "confidence": round(confidence, 2),
                 "model": "SMA"
             }
         except Exception as e:

@@ -31,10 +31,18 @@ const PortfolioChart: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const valueHistory = getPortfolioValueHistory();
-    const cleanedHistory = cleanPortfolioValueHistory(valueHistory);
-    setHistory(cleanedHistory);
-    setLoading(false);
+    const loadHistory = async () => {
+      try {
+        const valueHistory = await getPortfolioValueHistory();
+        const cleanedHistory = cleanPortfolioValueHistory(valueHistory);
+        setHistory(cleanedHistory);
+      } catch (error) {
+        console.error('Failed to load portfolio history:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadHistory();
   }, []);
 
   const bgColor = useColorModeValue('white', 'gray.800');

@@ -15,32 +15,22 @@ const theme = extendTheme({
       },
     },
   },
-  components: {
-    Container: {
-      baseStyle: {
-        maxW: 'container.xl',
-        px: { base: 4, md: 6, lg: 8 },
-      },
-    },
-  },
 });
 
 function App() {
   return (
     <ChakraProvider theme={theme}>
       <Router>
-        <Box minH="100vh" pt="4rem">
+        <Box minH="100vh">
           <Navbar />
-          <Box as="main" py={{ base: 4, md: 8 }}>
-            <Container>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/search" element={<StockSearch />} />
-                <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/stock/:symbol" element={<StockDetails />} />
-              </Routes>
-            </Container>
-          </Box>
+          <Container maxW="container.xl" py={8}>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/search" element={<StockSearch />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/stock/:symbol" element={<StockDetails />} />
+            </Routes>
+          </Container>
         </Box>
       </Router>
     </ChakraProvider>
