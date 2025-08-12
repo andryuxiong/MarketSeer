@@ -38,3 +38,7 @@ htmlcov/
 # Misc
 .cache/
 .temp/
+
+# Personal documentation (local only)
+CHANGELOG.md
+SETUP_ENHANCED.md
