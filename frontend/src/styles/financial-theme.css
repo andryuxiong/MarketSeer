@@ -1,0 +1,397 @@
+/* Financial Terminal Theme CSS */
+:root {
+  /* Terminal Color Palette */
+  --terminal-bg: #0a0e13;
+  --terminal-surface: #141b23;
+  --terminal-surface-elevated: #1d252e;
+  --terminal-border: #263340;
+  --terminal-border-hover: #2d4959;
+  
+  /* Electric Green Accent System */
+  --terminal-primary: #00ff88;
+  --terminal-primary-dim: #00cc6a;
+  --terminal-primary-bright: #00ffaa;
+  --terminal-primary-glow: rgba(0, 255, 136, 0.3);
+  --terminal-primary-soft: rgba(0, 255, 136, 0.1);
+  
+  /* Status Colors */
+  --terminal-success: #00ff88;
+  --terminal-warning: #ffaa00;
+  --terminal-danger: #ff4444;
+  --terminal-info: #00aaff;
+  
+  /* Text Colors */
+  --terminal-text: #e1e8f0;
+  --terminal-text-dim: #8b9bb3;
+  --terminal-text-muted: #5a6c7d;
+  --terminal-text-inverse: #0a0e13;
+  
+  /* Chart Colors */
+  --chart-grid: #263340;
+  --chart-gain: #00ff88;
+  --chart-loss: #ff4444;
+  --chart-neutral: #8b9bb3;
+  
+  /* Special Effects */
+  --terminal-glow-sm: 0 0 10px var(--terminal-primary-glow);
+  --terminal-glow-md: 0 0 15px var(--terminal-primary-glow);
+  --terminal-glow-lg: 0 0 25px var(--terminal-primary-glow);
+  
+  /* Trading Grid Pattern */
+  --grid-pattern: 
+    linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+  --grid-size: 20px;
+}
+
+/* Import Orbitron Font */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+/* Base Terminal Styling */
+body {
+  background: var(--terminal-bg);
+  color: var(--terminal-text);
+  font-family: 'Orbitron', 'Consolas', 'Monaco', 'Courier New', monospace;
+  letter-spacing: 0.025em;
+}
+
+/* Terminal Grid Background */
+.terminal-grid {
+  background-image: var(--grid-pattern);
+  background-size: var(--grid-size) var(--grid-size);
+  background-position: 0 0, 0 0;
+}
+
+/* Terminal Card Styling */
+.terminal-card {
+  background: var(--terminal-surface) !important;
+  border: 1px solid var(--terminal-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.terminal-card:hover {
+  border-color: var(--terminal-border-hover) !important;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    0 0 15px var(--terminal-primary-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+/* Terminal Button Styling */
+.terminal-button {
+  background: linear-gradient(135deg, var(--terminal-surface-elevated), var(--terminal-surface)) !important;
+  border: 1px solid var(--terminal-border) !important;
+  color: var(--terminal-primary) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.terminal-button:hover {
+  background: linear-gradient(135deg, var(--terminal-primary), var(--terminal-primary-dim)) !important;
+  border-color: var(--terminal-primary) !important;
+  color: var(--terminal-text-inverse) !important;
+  box-shadow: var(--terminal-glow-md) !important;
+  transform: translateY(-1px) !important;
+}
+
+.terminal-button:active {
+  transform: translateY(0px) !important;
+  box-shadow: var(--terminal-glow-sm) !important;
+}
+
+/* Terminal Input Styling */
+.terminal-input {
+  background: var(--terminal-surface-elevated) !important;
+  border: 1px solid var(--terminal-border) !important;
+  color: var(--terminal-text) !important;
+  font-family: 'Orbitron', monospace !important;
+}
+
+.terminal-input:focus {
+  border-color: var(--terminal-primary) !important;
+  box-shadow: 
+    0 0 0 1px var(--terminal-primary),
+    var(--terminal-glow-sm) !important;
+}
+
+.terminal-input::placeholder {
+  color: var(--terminal-text-muted) !important;
+}
+
+/* Terminal Navbar Styling */
+.terminal-navbar {
+  background: rgba(10, 14, 19, 0.95) !important;
+  border-bottom: 1px solid var(--terminal-border) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.terminal-logo {
+  color: var(--terminal-primary) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 800 !important;
+  font-size: 1.75rem !important;
+  letter-spacing: 0.1em !important;
+  text-shadow: var(--terminal-glow-sm) !important;
+  text-transform: uppercase !important;
+}
+
+.terminal-nav-link {
+  color: var(--terminal-text-dim) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  transition: all 0.2s ease !important;
+}
+
+.terminal-nav-link:hover {
+  color: var(--terminal-primary) !important;
+  text-shadow: var(--terminal-glow-sm) !important;
+  background: var(--terminal-primary-soft) !important;
+}
+
+/* Terminal Typography */
+.terminal-heading {
+  color: var(--terminal-text) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.075em !important;
+  text-transform: uppercase !important;
+}
+
+.terminal-heading-accent {
+  color: var(--terminal-primary) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  text-shadow: var(--terminal-glow-sm) !important;
+}
+
+.terminal-text {
+  color: var(--terminal-text) !important;
+  font-family: 'Orbitron', monospace !important;
+}
+
+.terminal-text-dim {
+  color: var(--terminal-text-dim) !important;
+  font-family: 'Orbitron', monospace !important;
+}
+
+.terminal-text-muted {
+  color: var(--terminal-text-muted) !important;
+  font-family: 'Orbitron', monospace !important;
+}
+
+/* Market Status Indicators */
+.market-status {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.market-status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.market-status-open {
+  background: var(--terminal-success);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.market-status-closed {
+  background: var(--terminal-danger);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+.market-status-pre {
+  background: var(--terminal-warning);
+  box-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Terminal Stats Styling */
+.terminal-stat-label {
+  color: var(--terminal-text-dim) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 500 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+.terminal-stat-number {
+  color: var(--terminal-text) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.025em !important;
+}
+
+.terminal-stat-positive {
+  color: var(--terminal-success) !important;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3) !important;
+}
+
+.terminal-stat-negative {
+  color: var(--terminal-danger) !important;
+  text-shadow: 0 0 8px rgba(255, 68, 68, 0.3) !important;
+}
+
+/* Terminal Badge Styling */
+.terminal-badge {
+  background: var(--terminal-surface-elevated) !important;
+  border: 1px solid var(--terminal-border) !important;
+  color: var(--terminal-primary) !important;
+  font-family: 'Orbitron', monospace !important;
+  font-weight: 600 !important;
+  font-size: 0.625rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  padding: 0.25rem 0.5rem !important;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--terminal-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--terminal-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--terminal-primary-dim);
+}
+
+/* Chart Overrides for Terminal Theme */
+.terminal-chart canvas {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Animation Classes */
+.terminal-fade-in {
+  animation: terminalFadeIn 0.3s ease-out;
+}
+
+@keyframes terminalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.terminal-glow-hover {
+  transition: all 0.2s ease;
+}
+
+.terminal-glow-hover:hover {
+  box-shadow: var(--terminal-glow-md);
+  transform: translateY(-1px);
+}
+
+/* Terminal Grid Lines for Data Tables */
+.terminal-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.terminal-table th,
+.terminal-table td {
+  border: 1px solid var(--terminal-border);
+  padding: 0.75rem;
+  font-family: 'Orbitron', monospace;
+}
+
+.terminal-table th {
+  background: var(--terminal-surface-elevated);
+  color: var(--terminal-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.terminal-table tbody tr:hover {
+  background: var(--terminal-primary-soft);
+}
+
+/* Loading Spinner Override */
+.terminal-spinner {
+  border-color: var(--terminal-border) var(--terminal-border) var(--terminal-border) var(--terminal-primary) !important;
+}
+
+/* Alert Styling */
+.terminal-alert {
+  background: var(--terminal-surface-elevated) !important;
+  border: 1px solid var(--terminal-border) !important;
+  color: var(--terminal-text) !important;
+}
+
+.terminal-alert-success {
+  border-color: var(--terminal-success) !important;
+  background: rgba(0, 255, 136, 0.1) !important;
+}
+
+.terminal-alert-warning {
+  border-color: var(--terminal-warning) !important;
+  background: rgba(255, 170, 0, 0.1) !important;
+}
+
+.terminal-alert-danger {
+  border-color: var(--terminal-danger) !important;
+  background: rgba(255, 68, 68, 0.1) !important;
+}
+
+/* Terminal Form Elements */
+.terminal-select {
+  background: var(--terminal-surface-elevated) !important;
+  border: 1px solid var(--terminal-border) !important;
+  color: var(--terminal-text) !important;
+  font-family: 'Orbitron', monospace !important;
+}
+
+.terminal-select:focus {
+  border-color: var(--terminal-primary) !important;
+  box-shadow: var(--terminal-glow-sm) !important;
+}
+
+/* Menu and Dropdown Styling */
+.terminal-menu {
+  background: var(--terminal-surface) !important;
+  border: 1px solid var(--terminal-border) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+.terminal-menu-item {
+  color: var(--terminal-text) !important;
+  font-family: 'Orbitron', monospace !important;
+}
+
+.terminal-menu-item:hover {
+  background: var(--terminal-primary-soft) !important;
+  color: var(--terminal-primary) !important;
+}
