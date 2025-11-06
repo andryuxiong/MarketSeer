@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+// Portfolio chart component with terminal styling
 import { Box, Spinner, Text, useColorModeValue } from '@chakra-ui/react';
 import {
   Chart as ChartJS,
