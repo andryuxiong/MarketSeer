@@ -1,29 +1,20 @@
 import React from 'react';
-import { ChakraProvider, Box, Container, extendTheme } from '@chakra-ui/react';
+import { ChakraProvider, Box, Container } from '@chakra-ui/react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import StockSearch from './pages/StockSearch';
 import Portfolio from './pages/Portfolio';
 import StockDetails from './pages/StockDetails';
-
-const theme = extendTheme({
-  styles: {
-    global: {
-      body: {
-        bg: 'gray.50',
-      },
-    },
-  },
-});
+import { financialTheme } from './theme/financial-chakra-theme';
 
 function App() {
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider theme={financialTheme}>
       <Router>
-        <Box minH="100vh">
+        <Box minH="100vh" className="terminal-grid">
           <Navbar />
-          <Container maxW="container.xl" py={8}>
+          <Container maxW="container.xl" py={6} pt={24}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/search" element={<StockSearch />} />
