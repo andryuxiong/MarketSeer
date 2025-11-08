@@ -26,7 +26,7 @@ export interface PortfolioValuePoint {
   value: number;
 }
 
-const STARTING_CASH = 100000;
+const STARTING_CASH = 100000; // Default starting portfolio value
 const PORTFOLIO_KEY = 'virtual_portfolio';
 const VALUE_HISTORY_KEY = 'virtual_portfolio_value_history';
 
