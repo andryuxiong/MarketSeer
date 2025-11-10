@@ -1,6 +1,6 @@
 import { extendTheme, type ThemeConfig } from '@chakra-ui/react';
 
-// Terminal color palette
+// Terminal color palette - optimized for trading interfaces
 const colors = {
   terminal: {
     // Background colors
