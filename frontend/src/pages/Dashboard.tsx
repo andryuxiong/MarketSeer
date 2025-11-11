@@ -104,21 +104,18 @@ const Dashboard: React.FC = () => {
   const [portfolioHistory, setPortfolioHistory] = useState<PortfolioValuePoint[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.800', 'white');
-  const sectionTitleColor = useColorModeValue('blue.700', 'blue.200');
-  const statNumberColor = useColorModeValue('gray.900', 'white');
-  const statLabelColor = useColorModeValue('gray.600', 'gray.400');
-  const accentColor = useColorModeValue('blue.500', 'blue.300');
-  const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const newsCardBg = useColorModeValue('gray.100', 'gray.700');
-  const gradientBg = useColorModeValue(
-    'linear(to-br, blue.50, gray.50)',
-    'linear(to-br, gray.900, blue.900)'
-  );
-  const upTrendColor = useColorModeValue('green.500', 'green.300');
-  const downTrendColor = useColorModeValue('red.500', 'red.300');
+  // Terminal theme colors
+  const cardBg = 'terminal.surface';
+  const textColor = 'terminal.text';
+  const sectionTitleColor = 'terminal.primary';
+  const statNumberColor = 'terminal.text';
+  const statLabelColor = 'terminal.textDim';
+  const accentColor = 'terminal.primary';
+  const bgColor = 'terminal.bg';
+  const borderColor = 'terminal.border';
+  const newsCardBg = 'terminal.surfaceElevated';
+  const upTrendColor = 'terminal.success';
+  const downTrendColor = 'terminal.danger';
 
   // Market indices state
   const [marketIndices, setMarketIndices] = React.useState<any[]>([]);
@@ -289,15 +286,19 @@ const Dashboard: React.FC = () => {
       {
         label: 'Portfolio Value',
         data: portfolioHistory.map((pt) => pt.value),
-        borderColor: '#3182CE', // fallback color
+        borderColor: '#00ff88', // terminal primary green
         segment: {
           borderColor: (ctx: ScriptableLineSegmentContext) => {
-            return ctx.p0.parsed.y >= STARTING_CASH ? '#68D391' : '#FC8181';
+            return ctx.p0.parsed.y >= STARTING_CASH ? '#00ff88' : '#ff4444';
           },
         },
-        backgroundColor: 'rgba(49,130,206,0.1)',
+        backgroundColor: 'rgba(0, 255, 136, 0.1)',
         fill: true,
         tension: 0.2,
+        pointBackgroundColor: '#00ff88',
+        pointBorderColor: '#00ff88',
+        pointHoverBackgroundColor: '#00ffaa',
+        pointHoverBorderColor: '#00ffaa',
       },
     ],
   };
@@ -371,21 +372,38 @@ const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <Box bg={bgColor} minH="100vh" py={8} bgGradient={gradientBg}>
+    <Box bg={bgColor} minH="100vh" py={8} className="terminal-grid">
       <Box maxW="container.xl" mx="auto" px={4}>
-        {/* Welcome Section */}
+        {/* Welcome Section with Market Status */}
         <MotionBox
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           mb={8}
         >
-          <Heading size="lg" color={sectionTitleColor} textAlign="center" textShadow="0 2px 8px rgba(0,0,0,0.15)">
-            Welcome to MarketSeer
-          </Heading>
-          <Text textAlign="center" color={statLabelColor} mt={2}>
-            Your comprehensive market analysis dashboard
-          </Text>
+          <VStack spacing={4}>
+            <Heading 
+              size="xl" 
+              className="terminal-heading-accent"
+              textAlign="center"
+            >
+              MarketSeer Terminal
+            </Heading>
+            <HStack spacing={6}>
+              <Text className="terminal-text-dim" fontSize="sm" letterSpacing="wide">
+                REAL-TIME MARKET DATA
+              </Text>
+              <Box className="market-status">
+                <Box className="market-status-indicator market-status-open" />
+                <Text className="terminal-text-dim" fontSize="xs" textTransform="uppercase">
+                  MARKET OPEN
+                </Text>
+              </Box>
+              <Text className="terminal-text-dim" fontSize="xs" textTransform="uppercase">
+                {new Date().toLocaleString()}
+              </Text>
+            </HStack>
+          </VStack>
         </MotionBox>
       
       {/* Market Overview */}
@@ -398,8 +416,7 @@ const Dashboard: React.FC = () => {
             marketIndices.map((index, i) => (
             <MotionCard
               key={index.name}
-              bg={cardBg}
-              boxShadow="lg"
+              className="terminal-card"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
@@ -410,9 +427,9 @@ const Dashboard: React.FC = () => {
                 <VStack align="stretch" spacing={3}>
                   <HStack justify="space-between">
               <Stat>
-                      <StatLabel color={statLabelColor} fontSize="lg">{index.name}</StatLabel>
-                      <StatNumber color={statNumberColor} fontSize="2xl">${index.value}</StatNumber>
-                      <StatHelpText color={index.trend === 'up' ? upTrendColor : downTrendColor}>
+                      <StatLabel className="terminal-stat-label">{index.name}</StatLabel>
+                      <StatNumber className="terminal-stat-number" fontSize="2xl">${index.value}</StatNumber>
+                      <StatHelpText className={index.trend === 'up' ? 'terminal-stat-positive' : 'terminal-stat-negative'}>
                   <StatArrow type={index.trend === 'up' ? 'increase' : 'decrease'} />
                   {index.change}
                 </StatHelpText>
@@ -438,14 +455,13 @@ const Dashboard: React.FC = () => {
           <VStack spacing={6} align="stretch">
             {/* Portfolio Performance */}
               <MotionCard
-                bg={cardBg}
-                boxShadow="lg"
+                className="terminal-card"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5 }}
               >
               <CardBody>
-                  <Heading size="md" mb={4} color={sectionTitleColor}>Portfolio Performance</Heading>
+                  <Heading size="md" mb={4} className="terminal-heading-accent">Portfolio Performance</Heading>
                 <Box h="300px">
                     <Line data={valueLineData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={300} />
                 </Box>
