@@ -394,4 +394,4 @@ body {
 .terminal-menu-item:hover {
   background: var(--terminal-primary-soft) !important;
   color: var(--terminal-primary) !important;
-}
+}/* Terminal theme optimization for better performance */
