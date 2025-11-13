@@ -63,8 +63,12 @@ const PortfolioChart: React.FC = () => {
         label: 'Portfolio Value',
         data: history.map(point => point.value),
         fill: true,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+        borderColor: '#00ff88',
+        pointBackgroundColor: '#00ff88',
+        pointBorderColor: '#00ff88', 
+        pointHoverBackgroundColor: '#00ffaa',
+        pointHoverBorderColor: '#00ffaa',
         tension: 0.4
       }
     ]
@@ -76,35 +80,62 @@ const PortfolioChart: React.FC = () => {
       legend: {
         position: 'top' as const,
         labels: {
-          color: textColor
+          color: '#e1e8f0',
+          font: {
+            family: 'Orbitron, monospace',
+            weight: 'bold' as const
+          }
         }
       },
       title: {
         display: true,
         text: 'Portfolio Value History',
-        color: textColor
+        color: '#00ff88',
+        font: {
+          family: 'Orbitron, monospace',
+          weight: 'bold' as const
+        }
       }
     },
     scales: {
       y: {
         beginAtZero: false,
+        grid: {
+          color: '#263340'
+        },
         ticks: {
-          color: textColor,
+          color: '#8b9bb3',
+          font: {
+            family: 'Orbitron, monospace'
+          },
           callback: function(tickValue: number | string) {
             return `$${Number(tickValue).toLocaleString()}`;
           }
         }
       },
       x: {
+        grid: {
+          color: '#263340'
+        },
         ticks: {
-          color: textColor
+          color: '#8b9bb3',
+          font: {
+            family: 'Orbitron, monospace'
+          }
         }
       }
     }
   };
 
   return (
-    <Box bg={bgColor} p={4} borderRadius="lg" boxShadow="md">
+    <Box 
+      bg="terminal.surface" 
+      p={4} 
+      borderRadius="lg" 
+      border="1px solid"
+      borderColor="terminal.border"
+      className="terminal-card terminal-chart"
+    >
       <Line data={data} options={options} />
     </Box>
   );
