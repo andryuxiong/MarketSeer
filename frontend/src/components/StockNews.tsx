@@ -74,21 +74,15 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
         // Try primary endpoint first
         let newsRes = await fetch(formatApiUrl(`/api/news/${symbol}`));
         
-        // If that fails, try alternative endpoint
         if (!newsRes.ok) {
-          console.log('Primary news endpoint failed, trying alternative...');
-          newsRes = await fetch(formatApiUrl(`/api/stocks/${symbol}/news`));
-          
-          if (!newsRes.ok) {
-            const errorText = await newsRes.text();
-            console.error('News API Error:', {
-              status: newsRes.status,
-              statusText: newsRes.statusText,
-              error: errorText,
-              symbol
-            });
-            throw new Error(`Failed to fetch news: ${newsRes.status} ${newsRes.statusText}`);
-          }
+          const errorText = await newsRes.text();
+          console.error('News API Error:', {
+            status: newsRes.status,
+            statusText: newsRes.statusText,
+            error: errorText,
+            symbol
+          });
+          throw new Error(`Failed to fetch news: ${newsRes.status} ${newsRes.statusText}`);
         }
         
         const newsData = await newsRes.json();

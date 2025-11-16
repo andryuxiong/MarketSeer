@@ -1,0 +1,31 @@
+{
+  "name": "marketseer-dev",
+  "version": "1.0.0",
+  "description": "MarketSeer development scripts",
+  "private": true,
+  "scripts": {
+    "dev": "npm run kill-ports && concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && ./venv/bin/python -m uvicorn app.main:app --reload --port 8000",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:enhanced": "npm run kill-ports && concurrently \"npm run dev:backend-enhanced\" \"npm run dev:frontend\"",
+    "dev:backend-enhanced": "cd backend && ./venv/bin/python -m uvicorn app.main_enhanced:app --reload --port 8001",
+    "kill-ports": "lsof -ti:8000 | xargs kill -9 2>/dev/null || true && lsof -ti:3000 | xargs kill -9 2>/dev/null || true",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "clean": "npm run clean:frontend && npm run clean:backend",
+    "clean:frontend": "cd frontend && rm -rf node_modules package-lock.json",
+    "clean:backend": "cd backend && rm -rf __pycache__ .pytest_cache",
+    "test": "concurrently \"npm run test:frontend\" \"npm run test:backend\"",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && python -m pytest",
+    "build": "cd frontend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

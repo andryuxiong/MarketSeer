@@ -262,6 +262,22 @@ async def get_stock_news_alt(symbol: str) -> List[NewsItem]:
         logger.error(f"Error fetching news for {symbol}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/news/market")
+async def get_market_news() -> List[NewsItem]:
+    """Get general market news articles"""
+    try:
+        logger.info("Fetching general market news")
+        news = await news_service.get_market_news()
+        logger.info(f"Retrieved {len(news)} market news articles")
+        if not news:
+            logger.warning("No market news articles found")
+        else:
+            logger.debug(f"First article: {news[0].title} from {news[0].source}")
+        return news
+    except Exception as e:
+        logger.error(f"Error fetching market news: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error fetching market news: {str(e)}")
+
 @app.get("/api/sentiment/{symbol}")
 async def analyze_sentiment(symbol: str) -> SentimentAnalysis:
     """Get sentiment analysis for a given stock symbol"""

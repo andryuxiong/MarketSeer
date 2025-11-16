@@ -63,7 +63,7 @@ const StockDetails: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const quoteRes = await fetch(formatApiUrl(`/api/stocks/quote/${symbol}`));
+        const quoteRes = await fetch(formatApiUrl(`/api/stock/quote/${symbol}`));
         const stockQuoteData = await quoteRes.json();
         setStockData(stockQuoteData);
         

@@ -31,7 +31,7 @@ const StockChart: React.FC<StockChartProps> = ({ symbol, timeframe, height = 350
         setError(null);
         
         // Try primary endpoint first
-        let response = await fetch(formatApiUrl(`/api/stocks/historical/${symbol}`));
+        let response = await fetch(formatApiUrl(`/api/stock/historical/${symbol}`));
         
         // If that fails, try alternative endpoint
         if (!response.ok) {
