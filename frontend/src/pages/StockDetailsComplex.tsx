@@ -128,7 +128,7 @@ const StockDetails: React.FC = () => {
         
         // Fetch current stock data using enhanced endpoints
         console.log('Fetching stock data for:', symbol);
-        const quoteRes = await fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)); // Enhanced endpoint
+        const quoteRes = await fetch(formatApiUrl(`/api/stock/quote/${symbol}`)); // Working endpoint
         
         console.log('Stock data response:', quoteRes);
         const stockQuoteData = await quoteRes.json();

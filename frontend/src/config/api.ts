@@ -79,7 +79,8 @@ export const formatApiUrl = (endpoint: string) => {
 export const API_ENDPOINTS = {
   // Stock endpoints
   STOCK: {
-    QUOTE: (symbol: string) => `/api/stocks/quote/${symbol}`,           // Enhanced quote
+    QUOTE: (symbol: string) => `/api/stock/quote/${symbol}`,            // Regular quote endpoint
+    ENHANCED_QUOTE: (symbol: string) => `/api/stocks/quote/${symbol}`,  // Enhanced quote (if available)
     PROFILE: (symbol: string) => `/api/stock/profile/${symbol}`,
     HISTORICAL: (symbol: string) => `/api/stock/historical/${symbol}`,
     PREDICT: (symbol: string) => `/api/stock/predict/${symbol}`,

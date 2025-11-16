@@ -67,7 +67,7 @@ const PortfolioPage: React.FC = () => {
   // Fetch current price for the symbol
   const fetchPrice = async (symbol: string) => {
     try {
-      const res = await fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)); // Fixed endpoint
+      const res = await fetch(formatApiUrl(`/api/stock/quote/${symbol}`)); // Working endpoint
       if (!res.ok) throw new Error('Failed to fetch price');
       const data = await res.json();
       return data.c;
@@ -362,7 +362,7 @@ const PortfolioPage: React.FC = () => {
 const AsyncPrice: React.FC<{ symbol: string; avgPrice: number }> = ({ symbol, avgPrice }) => {
   const [price, setPrice] = useState<number | null>(null);
   useEffect(() => {
-    fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)) // Fixed endpoint
+    fetch(formatApiUrl(`/api/stock/quote/${symbol}`)) // Working endpoint
       .then(res => res.json())
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));
@@ -373,7 +373,7 @@ const AsyncPrice: React.FC<{ symbol: string; avgPrice: number }> = ({ symbol, av
 const AsyncValue: React.FC<{ symbol: string; shares: number; avgPrice: number }> = ({ symbol, shares, avgPrice }) => {
   const [price, setPrice] = useState<number | null>(null);
   useEffect(() => {
-    fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)) // Fixed endpoint
+    fetch(formatApiUrl(`/api/stock/quote/${symbol}`)) // Working endpoint
       .then(res => res.json())
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));
@@ -385,7 +385,7 @@ const AsyncValue: React.FC<{ symbol: string; shares: number; avgPrice: number }>
 const AsyncGain: React.FC<{ symbol: string; shares: number; avgPrice: number }> = ({ symbol, shares, avgPrice }) => {
   const [price, setPrice] = useState<number | null>(null);
   useEffect(() => {
-    fetch(formatApiUrl(`/api/stocks/quote/${symbol}`)) // Fixed endpoint
+    fetch(formatApiUrl(`/api/stock/quote/${symbol}`)) // Working endpoint
       .then(res => res.json())
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));

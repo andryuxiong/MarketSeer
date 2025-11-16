@@ -330,12 +330,12 @@ const Dashboard: React.FC = () => {
         const newsData = await response.json();
         
         const formattedNews = newsData.slice(0, 3).map((item: any) => ({
-          title: item.headline,
+          title: item.title,
           source: item.source,
           time: 'Just now',
-          sentiment: item.sentiment > 0.5 ? 'positive' : item.sentiment < 0.3 ? 'negative' : 'neutral',
-          impact: item.impact > 0.7 ? 'high' : item.impact > 0.4 ? 'medium' : 'low',
-          category: item.category || 'Market',
+          sentiment: item.sentiment_score > 0.6 ? 'positive' : item.sentiment_score < 0.4 ? 'negative' : 'neutral',
+          impact: item.relevance_score > 0.7 ? 'high' : item.relevance_score > 0.4 ? 'medium' : 'low',
+          category: 'Market',
           url: item.url
         }));
 

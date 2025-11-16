@@ -101,6 +101,59 @@ class NewsService:
             )
             logger.debug("Created new aiohttp session with custom configuration")
 
+    async def get_market_news(self) -> List[NewsItem]:
+        """Get general market news articles"""
+        try:
+            logger.info("Starting general market news fetch")
+            await self._create_session()
+            
+            # Fetch general market news
+            logger.info("Fetching general market news from Yahoo Finance and MarketWatch")
+            tasks = [
+                self._fetch_yahoo_market_news(),
+                self._fetch_market_watch_market_news()
+            ]
+            
+            news_lists = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            # Log results from each source
+            for i, news_list in enumerate(news_lists):
+                source = "Yahoo Finance" if i == 0 else "MarketWatch"
+                if isinstance(news_list, Exception):
+                    logger.error(f"Error fetching market news from {source}: {str(news_list)}")
+                else:
+                    logger.info(f"Retrieved {len(news_list)} market articles from {source}")
+            
+            # Combine and process news
+            all_news = []
+            for news_list in news_lists:
+                if isinstance(news_list, list):
+                    all_news.extend(news_list)
+            
+            logger.info(f"Total market articles before deduplication: {len(all_news)}")
+            
+            # Sort by date and remove duplicates
+            all_news.sort(key=lambda x: x.published_at, reverse=True)
+            unique_news = self._remove_duplicates(all_news)
+            logger.info(f"Total market articles after deduplication: {len(unique_news)}")
+            
+            # Calculate sentiment and relevance scores for market news
+            for news in unique_news:
+                news.sentiment_score = self._calculate_sentiment(news.title + " " + news.summary)
+                news.relevance_score = self._calculate_market_relevance(news)
+                # Convert datetime to Unix timestamp
+                if isinstance(news.published_at, datetime):
+                    news.published_at = int(news.published_at.timestamp())
+            
+            # Sort by relevance and return top news
+            unique_news.sort(key=lambda x: x.relevance_score, reverse=True)
+            top_news = unique_news[:15]
+            return top_news
+            
+        except Exception as e:
+            logger.error(f"Error in get_market_news: {str(e)}", exc_info=True)
+            raise Exception(f"Error fetching market news: {str(e)}")
+
     async def get_stock_news(self, symbol: str) -> List[NewsItem]:
         """Get news articles for a given stock symbol"""
         try:
@@ -149,8 +202,7 @@ class NewsService:
             
             # Sort by relevance and return top news
             unique_news.sort(key=lambda x: x.relevance_score, reverse=True)
-            top_news = unique_news[:10]  # Return top 10 most relevant news
-            logger.info(f"Returning top {len(top_news)} most relevant articles")
+            top_news = unique_news[:10]
             return top_news
             
         except Exception as e:
@@ -283,8 +335,8 @@ class NewsService:
                                 url=link,
                                 published_at=published_at,
                                 summary=summary,
-                                sentiment_score=0.0,  # Will be calculated later
-                                relevance_score=0.0   # Will be calculated later
+                                sentiment_score=0.0,
+                                relevance_score=0.0
                             ))
                             logger.debug(f"Successfully parsed article: {title}")
                         except Exception as e:
@@ -297,6 +349,115 @@ class NewsService:
                 return []
         except Exception as e:
             logger.error(f"Error fetching MarketWatch news: {str(e)}", exc_info=True)
+            return []
+
+    async def _fetch_yahoo_market_news(self) -> List[NewsItem]:
+        """Fetch general market news from Yahoo Finance"""
+        try:
+            await self._create_session()
+            url = "https://finance.yahoo.com/news/"
+            logger.debug(f"Fetching Yahoo Finance market news from: {url}")
+            
+            try:
+                async with self.session.get(url, allow_redirects=True) as response:
+                    if response.status == 200:
+                        html = await response.text()
+                        soup = BeautifulSoup(html, 'html.parser')
+                        news_items = []
+                        
+                        # Parse news articles from the news page
+                        articles = soup.find_all('div', {'class': 'js-content-viewer'}) or soup.find_all('h3', {'class': 'Mb(5px)'})
+                        logger.debug(f"Found {len(articles)} market articles on Yahoo Finance")
+                        
+                        for article in articles[:10]:
+                            try:
+                                title_elem = article.find('a') or article
+                                if not title_elem:
+                                    continue
+                                title = title_elem.get_text(strip=True)
+                                
+                                link = title_elem.get('href') if hasattr(title_elem, 'get') else None
+                                if link and not link.startswith('http'):
+                                    link = 'https://finance.yahoo.com' + link
+                                elif not link:
+                                    continue
+                                
+                                news_items.append(NewsItem(
+                                    title=title,
+                                    source="Yahoo Finance",
+                                    url=link,
+                                    published_at=datetime.now(),
+                                    summary="Market news from Yahoo Finance",
+                                    sentiment_score=0.0,  # Will be calculated later
+                                    relevance_score=0.0   # Will be calculated later
+                                ))
+                                logger.debug(f"Successfully parsed market article: {title}")
+                            except Exception as e:
+                                logger.warning(f"Error parsing Yahoo Finance market article: {str(e)}")
+                                continue
+                        
+                        logger.info(f"Successfully fetched {len(news_items)} market articles from Yahoo Finance")
+                        return news_items
+                    logger.warning(f"Yahoo Finance returned status {response.status}")
+                    return []
+            except aiohttp.ClientError as e:
+                logger.error(f"Network error fetching Yahoo Finance market news: {str(e)}")
+                return []
+            except Exception as e:
+                logger.error(f"Unexpected error fetching Yahoo Finance market news: {str(e)}")
+                return []
+        except Exception as e:
+            logger.error(f"Error in Yahoo Finance market news fetch: {str(e)}", exc_info=True)
+            return []
+
+    async def _fetch_market_watch_market_news(self) -> List[NewsItem]:
+        """Fetch general market news from MarketWatch"""
+        try:
+            url = "https://www.marketwatch.com/markets"
+            logger.debug(f"Fetching MarketWatch market news from: {url}")
+            async with self.session.get(url) as response:
+                if response.status == 200:
+                    html = await response.text()
+                    soup = BeautifulSoup(html, 'html.parser')
+                    news_items = []
+                    
+                    # Parse news articles from the markets page
+                    articles = soup.find_all('div', {'class': 'article__content'}) or soup.find_all('h3', {'class': 'article__headline'})
+                    logger.debug(f"Found {len(articles)} market articles on MarketWatch")
+                    
+                    for article in articles[:10]:  # Limit to 10 articles
+                        try:
+                            title_elem = article.find('a') or article
+                            if not title_elem:
+                                continue
+                            title = title_elem.get_text(strip=True)
+                            
+                            link = title_elem.get('href') if hasattr(title_elem, 'get') else None
+                            if link and not link.startswith('http'):
+                                link = 'https://www.marketwatch.com' + link
+                            elif not link:
+                                continue
+                            
+                            news_items.append(NewsItem(
+                                title=title,
+                                source="MarketWatch",
+                                url=link,
+                                published_at=datetime.now(),
+                                summary="Market news from MarketWatch",
+                                sentiment_score=0.0,
+                                relevance_score=0.0
+                            ))
+                            logger.debug(f"Successfully parsed market article: {title}")
+                        except Exception as e:
+                            logger.warning(f"Error parsing MarketWatch market article: {str(e)}")
+                            continue
+                    
+                    logger.info(f"Successfully fetched {len(news_items)} market articles from MarketWatch")
+                    return news_items
+                logger.warning(f"MarketWatch returned status {response.status}")
+                return []
+        except Exception as e:
+            logger.error(f"Error fetching MarketWatch market news: {str(e)}", exc_info=True)
             return []
 
     def _remove_duplicates(self, news_list: List[NewsItem]) -> List[NewsItem]:
@@ -333,7 +494,7 @@ class NewsService:
             
             return positive_count / total
         except Exception as e:
-            return 0.5  # Neutral in case of error
+            return 0.5
 
     def _calculate_relevance(self, news: NewsItem, symbol: str) -> float:
         """Calculate relevance score for a news item"""
@@ -365,4 +526,46 @@ class NewsService:
             
             return min(1.0, relevance)  # Normalize to [0, 1]
         except Exception as e:
-            return 0.5  # Neutral in case of error
+            return 0.5
+
+    def _calculate_market_relevance(self, news: NewsItem) -> float:
+        """Calculate relevance score for market news"""
+        try:
+            # Combine title and summary
+            text = (news.title + " " + news.summary).lower()
+            
+            # Check for market-related terms
+            market_terms = {
+                'market', 'markets', 'economy', 'economic', 'fed', 'federal reserve',
+                'interest rate', 'inflation', 'gdp', 'unemployment', 'dow', 'nasdaq',
+                's&p', 'sp500', 'index', 'indices', 'bull', 'bear', 'trading',
+                'wall street', 'stock market', 'financial', 'finance'
+            }
+            
+            # High-impact terms that indicate important market news
+            high_impact_terms = {
+                'crash', 'surge', 'plunge', 'rally', 'correction', 'recession',
+                'recovery', 'bubble', 'crisis', 'volatility', 'breakout'
+            }
+            
+            # Economic indicators and events
+            economic_terms = {
+                'earnings', 'jobs report', 'employment', 'cpi', 'ppi', 'fomc',
+                'monetary policy', 'fiscal policy', 'trade war', 'tariff'
+            }
+            
+            market_score = sum(2 for term in market_terms if term in text)
+            impact_score = sum(3 for term in high_impact_terms if term in text)
+            economic_score = sum(2.5 for term in economic_terms if term in text)
+            
+            # Calculate time relevance (more recent news is more relevant)
+            time_diff = datetime.now() - (datetime.fromtimestamp(news.published_at) if isinstance(news.published_at, int) else news.published_at)
+            time_relevance = 1.0 / (1.0 + time_diff.days)
+            
+            # Combine factors with higher weight on market terms
+            total_score = market_score + impact_score + economic_score
+            relevance = (0.7 * min(1.0, total_score / 10)) + (0.3 * time_relevance)
+            
+            return min(1.0, relevance)  # Normalize to [0, 1]
+        except Exception as e:
+            return 0.5

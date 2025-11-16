@@ -70,7 +70,7 @@ const StockChart = ({ symbol }) => {
         console.log('Fetching historical data for:', symbol);
 
         // Try to fetch historical data from our backend first
-        let histResponse = await fetch(formatApiUrl(`/api/stocks/historical/${symbol}`));
+        let histResponse = await fetch(formatApiUrl(`/api/stock/historical/${symbol}`));
         
         // If that fails, try the alternative endpoint
         if (!histResponse.ok) {
@@ -95,7 +95,7 @@ const StockChart = ({ symbol }) => {
 
         const fetchPrediction = async () => {
           console.log('Fetching prediction data for:', symbol);
-          const predResponse = await fetch(formatApiUrl(`/api/stocks/predict/${symbol}`));
+          const predResponse = await fetch(formatApiUrl(`/api/stock/predict/${symbol}`));
           
           // If prediction endpoint fails, try alternative
           if (!predResponse.ok) {
