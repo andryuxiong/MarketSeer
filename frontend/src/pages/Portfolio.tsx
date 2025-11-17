@@ -43,10 +43,12 @@ const PortfolioPage: React.FC = () => {
   const [isResetOpen, setIsResetOpen] = useState(false);
   const cancelRef = React.useRef<HTMLButtonElement>(null);
 
-  // Theme colors
-  const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.800', 'white');
+  // Terminal theme colors
+  const bgColor = 'terminal.bg';
+  const cardBg = 'terminal.surface';
+  const textColor = 'terminal.text';
+  const statLabelColor = 'terminal.textDim';
+  const accentColor = 'terminal.primary';
 
   // Load value history on component mount
   useEffect(() => {
@@ -125,14 +127,14 @@ const PortfolioPage: React.FC = () => {
       {
         label: 'Portfolio Value',
         data: valueHistory.map((pt) => pt.value),
-        borderColor: '#3182CE', // fallback color
+        borderColor: '#00ff88', // terminal primary color
         segment: {
           borderColor: (ctx: ScriptableLineSegmentContext) => {
             // ctx.p0.parsed.y is the value at the start of the segment
-            return ctx.p0.parsed.y >= STARTING_CASH ? '#68D391' : '#FC8181';
+            return ctx.p0.parsed.y >= STARTING_CASH ? '#00ff88' : '#ff4444';
           },
         },
-        backgroundColor: 'rgba(49,130,206,0.1)',
+        backgroundColor: 'rgba(0, 255, 136, 0.1)',
         fill: true,
         tension: 0.2,
       },
@@ -155,7 +157,7 @@ const PortfolioPage: React.FC = () => {
       {
         data: pieData,
         backgroundColor: [
-          '#3182CE', '#63B3ED', '#BEE3F8', '#68D391', '#F6E05E', '#FC8181', '#A0AEC0', '#ECC94B', '#F687B3', '#CBD5E0',
+          '#00ff88', '#00ffaa', '#00cc6a', '#ffaa00', '#ff4444', '#00aaff', '#8b9bb3', '#5a6c7d', '#263340', '#1d252e',
         ],
       },
     ],
@@ -198,41 +200,41 @@ const PortfolioPage: React.FC = () => {
       {
         label: 'Gain/Loss',
         data: barData,
-        backgroundColor: barData.map((g) => (g >= 0 ? '#68D391' : '#FC8181')),
+        backgroundColor: barData.map((g) => (g >= 0 ? '#00ff88' : '#ff4444')),
       },
     ],
   };
 
   return (
-    <Box bg={bgColor} minH="100vh" py={8}>
+    <Box bg={bgColor} minH="100vh" py={8} className="terminal-grid">
       <Box maxW="container.lg" mx="auto" color={textColor}>
-        <Heading mb={6}>Virtual Portfolio</Heading>
+        <Heading mb={6} className="terminal-heading terminal-glow">Virtual Portfolio</Heading>
         <VStack align="stretch" spacing={6}>
-          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
+          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md" className="terminal-card" border="1px solid" borderColor="terminal.border">
             <Stat>
-              <StatLabel>Cash Balance</StatLabel>
-              <StatNumber>${portfolio.cash.toLocaleString(undefined, { maximumFractionDigits: 2 })}</StatNumber>
-              <StatHelpText>Available for trading</StatHelpText>
+              <StatLabel color={statLabelColor} className="terminal-text">Cash Balance</StatLabel>
+              <StatNumber color={accentColor} className="terminal-number terminal-glow">${portfolio.cash.toLocaleString(undefined, { maximumFractionDigits: 2 })}</StatNumber>
+              <StatHelpText color={statLabelColor} className="terminal-text">Available for trading</StatHelpText>
             </Stat>
-            <Button colorScheme="red" mt={2} onClick={() => setIsResetOpen(true)}>Reset Portfolio</Button>
+            <Button variant="outline" mt={2} onClick={() => setIsResetOpen(true)} className="terminal-button" color="terminal.danger" borderColor="terminal.danger" _hover={{ bg: 'rgba(255, 68, 68, 0.1)', borderColor: 'terminal.danger' }}>Reset Portfolio</Button>
             <AlertDialog
               isOpen={isResetOpen}
               leastDestructiveRef={cancelRef}
               onClose={() => setIsResetOpen(false)}
             >
               <AlertDialogOverlay>
-                <AlertDialogContent>
-                  <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                <AlertDialogContent bg="terminal.surface" border="1px solid" borderColor="terminal.border" className="terminal-card">
+                  <AlertDialogHeader fontSize="lg" fontWeight="bold" color={accentColor} className="terminal-heading">
                     Reset Portfolio
                   </AlertDialogHeader>
-                  <AlertDialogBody>
+                  <AlertDialogBody color={textColor} className="terminal-text">
                     Are you sure? This will delete all your holdings, cash, and performance history. This action cannot be undone.
                   </AlertDialogBody>
                   <AlertDialogFooter>
-                    <Button ref={cancelRef} onClick={() => setIsResetOpen(false)}>
+                    <Button ref={cancelRef} onClick={() => setIsResetOpen(false)} variant="outline" className="terminal-button">
                       Cancel
                     </Button>
-                    <Button colorScheme="red" onClick={handleReset} ml={3}>
+                    <Button onClick={handleReset} ml={3} className="terminal-button" bg="terminal.danger" color="terminal.textInverse" _hover={{ bg: 'rgba(255, 68, 68, 0.8)' }}>
                       Reset
                     </Button>
                   </AlertDialogFooter>
@@ -241,8 +243,8 @@ const PortfolioPage: React.FC = () => {
             </AlertDialog>
           </Box>
           <Divider />
-          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
-            <Heading size="md" mb={2}>Holdings</Heading>
+          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md" className="terminal-card" border="1px solid" borderColor="terminal.border">
+            <Heading size="md" mb={2} className="terminal-heading" color={accentColor}>Holdings</Heading>
           <Table variant="simple">
               <Thead>
               <Tr>
@@ -256,7 +258,7 @@ const PortfolioPage: React.FC = () => {
             </Thead>
             <Tbody>
                 {portfolio.holdings.length === 0 && (
-                  <Tr><Td colSpan={6}><Text>No holdings yet.</Text></Td></Tr>
+                  <Tr><Td colSpan={6}><Text className="terminal-text" color={statLabelColor}>No holdings yet.</Text></Td></Tr>
                 )}
                 {portfolio.holdings.map((holding) => (
                   <Tr key={holding.symbol}>
@@ -278,8 +280,8 @@ const PortfolioPage: React.FC = () => {
           </Table>
           </Box>
           <Divider />
-          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
-            <Heading size="md" mb={2}>Trade Stocks</Heading>
+          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md" className="terminal-card" border="1px solid" borderColor="terminal.border">
+            <Heading size="md" mb={2} className="terminal-heading" color={accentColor}>Trade Stocks</Heading>
             <HStack spacing={4}>
               <Select value={action} onChange={e => setAction(e.target.value as 'buy' | 'sell')} w="100px">
                 <option value="buy">Buy</option>
@@ -293,13 +295,13 @@ const PortfolioPage: React.FC = () => {
                 onChange={e => setShares(Number(e.target.value) || 0)}
                 w="100px"
               />
-              <Button colorScheme="blue" onClick={handleTrade} isLoading={loading}>Submit</Button>
+              <Button onClick={handleTrade} isLoading={loading} className="terminal-button terminal-glow" bg={accentColor} color="terminal.textInverse" _hover={{ bg: 'terminal.primaryBright', boxShadow: '0 0 15px var(--terminal-primary-glow)' }}>Submit</Button>
                         </HStack>
-            {price && <Text mt={2}>Latest Price: ${price.toFixed(2)}</Text>}
+            {price && <Text mt={2} className="terminal-text" color={accentColor}>Latest Price: <span className="terminal-number">${price.toFixed(2)}</span></Text>}
                       </Box>
           <Divider />
-          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
-            <Heading size="md" mb={2}>Trade History</Heading>
+          <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md" className="terminal-card" border="1px solid" borderColor="terminal.border">
+            <Heading size="md" mb={2} className="terminal-heading" color={accentColor}>Trade History</Heading>
             <Table variant="simple">
               <Thead>
                 <Tr>
@@ -312,7 +314,7 @@ const PortfolioPage: React.FC = () => {
               </Thead>
               <Tbody>
                 {portfolio.history.length === 0 && (
-                  <Tr><Td colSpan={5}><Text>No trades yet.</Text></Td></Tr>
+                  <Tr><Td colSpan={5}><Text className="terminal-text" color={statLabelColor}>No trades yet.</Text></Td></Tr>
                 )}
                 {portfolio.history.slice().reverse().map((trade, idx) => (
                   <Tr key={idx}>
@@ -329,26 +331,110 @@ const PortfolioPage: React.FC = () => {
                     </VStack>
         {/* Charts Section */}
         <Box mt={10}>
-          <Heading size="md" mb={4}>Portfolio Analytics</Heading>
+          <Heading size="md" mb={4} className="terminal-heading" color={accentColor}>Portfolio Analytics</Heading>
           <VStack spacing={8} align="stretch">
-            <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
-              <Heading size="sm" mb={2}>Portfolio Value Over Time</Heading>
+            <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md" className="terminal-card terminal-chart" border="1px solid" borderColor="terminal.border">
+              <Heading size="sm" mb={2} className="terminal-heading" color={accentColor}>Portfolio Value Over Time</Heading>
               {historyLoading ? (
                 <Box textAlign="center" py={20}>
-                  <Text>Loading portfolio history...</Text>
+                  <Text className="terminal-text" color={statLabelColor}>Loading portfolio history...</Text>
                 </Box>
               ) : (
-                <Line data={valueLineData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={200} />
+                <Line data={valueLineData} options={{
+                  responsive: true,
+                  plugins: {
+                    legend: { 
+                      display: false 
+                    },
+                    title: {
+                      display: true,
+                      text: 'Portfolio Performance',
+                      color: '#00ff88',
+                      font: {
+                        family: 'Orbitron, monospace',
+                        weight: 'bold' as const
+                      }
+                    }
+                  },
+                  scales: {
+                    y: {
+                      grid: {
+                        color: '#263340'
+                      },
+                      ticks: {
+                        color: '#8b9bb3',
+                        font: {
+                          family: 'Orbitron, monospace'
+                        }
+                      }
+                    },
+                    x: {
+                      grid: {
+                        color: '#263340'
+                      },
+                      ticks: {
+                        color: '#8b9bb3',
+                        font: {
+                          family: 'Orbitron, monospace'
+                        }
+                      }
+                    }
+                  }
+                }} height={200} />
               )}
             </Box>
             <HStack spacing={8} align="stretch" flexWrap="wrap">
-              <Box flex={1} minW="250px" bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
-                <Heading size="sm" mb={2}>Asset Allocation</Heading>
-                <Pie data={allocationPieData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} />
+              <Box flex={1} minW="250px" bg={cardBg} p={6} borderRadius="lg" boxShadow="md" className="terminal-card" border="1px solid" borderColor="terminal.border">
+                <Heading size="sm" mb={2} className="terminal-heading" color={accentColor}>Asset Allocation</Heading>
+                <Pie data={allocationPieData} options={{ 
+                  responsive: true, 
+                  plugins: { 
+                    legend: { 
+                      position: 'bottom' as const,
+                      labels: {
+                        color: '#e1e8f0',
+                        font: {
+                          family: 'Orbitron, monospace'
+                        }
+                      }
+                    }
+                  }
+                }} />
                       </Box>
-              <Box flex={1} minW="250px" bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
-                <Heading size="sm" mb={2}>Gain/Loss by Stock</Heading>
-                <Bar data={gainLossBarData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+              <Box flex={1} minW="250px" bg={cardBg} p={6} borderRadius="lg" boxShadow="md" className="terminal-card" border="1px solid" borderColor="terminal.border">
+                <Heading size="sm" mb={2} className="terminal-heading" color={accentColor}>Gain/Loss by Stock</Heading>
+                <Bar data={gainLossBarData} options={{ 
+                  responsive: true, 
+                  plugins: { 
+                    legend: { 
+                      display: false 
+                    }
+                  },
+                  scales: {
+                    y: {
+                      grid: {
+                        color: '#263340'
+                      },
+                      ticks: {
+                        color: '#8b9bb3',
+                        font: {
+                          family: 'Orbitron, monospace'
+                        }
+                      }
+                    },
+                    x: {
+                      grid: {
+                        color: '#263340'
+                      },
+                      ticks: {
+                        color: '#8b9bb3',
+                        font: {
+                          family: 'Orbitron, monospace'
+                        }
+                      }
+                    }
+                  }
+                }} />
                     </Box>
                     </HStack>
                   </VStack>
@@ -367,7 +453,7 @@ const AsyncPrice: React.FC<{ symbol: string; avgPrice: number }> = ({ symbol, av
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));
   }, [symbol]);
-  return <span>{price ? `$${price.toFixed(2)}` : `$${avgPrice.toFixed(2)}`}</span>;
+  return <span className="terminal-number" style={{ color: price && price !== avgPrice ? (price > avgPrice ? '#00ff88' : '#ff4444') : '#e1e8f0' }}>{price ? `$${price.toFixed(2)}` : `$${avgPrice.toFixed(2)}`}</span>;
 };
 
 const AsyncValue: React.FC<{ symbol: string; shares: number; avgPrice: number }> = ({ symbol, shares, avgPrice }) => {
@@ -379,7 +465,7 @@ const AsyncValue: React.FC<{ symbol: string; shares: number; avgPrice: number }>
       .catch(() => setPrice(null));
   }, [symbol]);
   const value = shares * (price || avgPrice);
-  return <span>${value.toFixed(2)}</span>;
+  return <span className="terminal-number" style={{ color: '#e1e8f0' }}>${value.toFixed(2)}</span>;
 };
 
 const AsyncGain: React.FC<{ symbol: string; shares: number; avgPrice: number }> = ({ symbol, shares, avgPrice }) => {
@@ -390,11 +476,11 @@ const AsyncGain: React.FC<{ symbol: string; shares: number; avgPrice: number }> 
       .then(data => setPrice(data.c))
       .catch(() => setPrice(null));
   }, [symbol]);
-  if (!price) return <span>N/A</span>;
+  if (!price) return <span className="terminal-text" style={{ color: '#8b9bb3' }}>N/A</span>;
   const gain = (price - avgPrice) * shares;
   const gainPercent = avgPrice ? (gain / (avgPrice * shares)) * 100 : 0;
   return (
-    <span style={{ color: gain >= 0 ? 'green' : 'red' }}>
+    <span className="terminal-number" style={{ color: gain >= 0 ? '#00ff88' : '#ff4444' }}>
       {gain >= 0 ? '+' : ''}${gain.toFixed(2)} ({gainPercent.toFixed(2)}%)
     </span>
   );
