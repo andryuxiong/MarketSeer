@@ -66,27 +66,18 @@ function generateRealisticChartData(): PortfolioValuePoint[] {
   return generateTradeBasedRealisticChart(trades, portfolio);
 }
 
-// Generate sample portfolio performance for empty portfolios
+// Generate flat line for empty portfolios (no trades)
 function generateSamplePortfolioPerformance(): PortfolioValuePoint[] {
   const history: PortfolioValuePoint[] = [];
   const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  let currentValue = STARTING_CASH;
   
+  // For portfolios with no trades, show flat line at starting cash value
   for (let i = 0; i <= 30; i++) {
     const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
     
-    // Realistic market simulation: slight upward bias with volatility
-    const dailyReturn = (Math.random() - 0.45) * 0.025; // -1% to +1.5% daily
-    currentValue *= (1 + dailyReturn);
-    
-    // Add occasional market events
-    if (i === 8) currentValue *= 0.97; // Small dip
-    if (i === 15) currentValue *= 1.04; // Rally
-    if (i === 22) currentValue *= 0.96; // Another dip
-    
     history.push({
       date: date.toISOString(),
-      value: Math.round(currentValue)
+      value: STARTING_CASH // Flat line at starting cash amount
     });
   }
   
