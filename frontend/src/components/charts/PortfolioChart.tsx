@@ -12,7 +12,7 @@ import {
   Filler
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { getPortfolioValueHistory, cleanPortfolioValueHistory, PortfolioValuePoint } from '../../utils/portfolio';
+import { getPortfolioValueHistory, cleanPortfolioValueHistory, PortfolioValuePoint, forceRebuildPortfolioHistory, rebuildPortfolioValueHistoryFromTrades } from '../../utils/portfolio';
 
 // Register Chart.js components
 ChartJS.register(
@@ -33,11 +33,21 @@ const PortfolioChart: React.FC = () => {
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const valueHistory = await getPortfolioValueHistory();
-        const cleanedHistory = cleanPortfolioValueHistory(valueHistory);
+        // Force rebuild to ensure we get realistic chart data
+        forceRebuildPortfolioHistory();
+        const realisticData = await rebuildPortfolioValueHistoryFromTrades();
+        const cleanedHistory = cleanPortfolioValueHistory(realisticData);
         setHistory(cleanedHistory);
       } catch (error) {
         console.error('Failed to load portfolio history:', error);
+        // Fallback to existing data if rebuild fails
+        try {
+          const valueHistory = await getPortfolioValueHistory();
+          const cleanedHistory = cleanPortfolioValueHistory(valueHistory);
+          setHistory(cleanedHistory);
+        } catch (fallbackError) {
+          console.error('Fallback also failed:', fallbackError);
+        }
       } finally {
         setLoading(false);
       }

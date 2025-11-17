@@ -242,7 +242,7 @@ const Dashboard: React.FC = () => {
       {
         data: pieData,
         backgroundColor: [
-          '#3182CE', '#63B3ED', '#BEE3F8', '#68D391', '#F6E05E', '#FC8181', '#A0AEC0', '#ECC94B', '#F687B3', '#CBD5E0',
+          '#00ff88', '#00cc6a', '#00ffaa', '#ffaa00', '#ff4444', '#00aaff', '#8b9bb3', '#e1e8f0', '#5a6c7d', '#263340',
         ],
       },
     ],
@@ -257,19 +257,29 @@ const Dashboard: React.FC = () => {
       {
         label: 'Gain/Loss (%)',
         data: barData,
-        backgroundColor: barData.map((g) => (g >= 0 ? '#68D391' : '#FC8181')),
+        backgroundColor: barData.map((g) => (g >= 0 ? '#00ff88' : '#ff4444')),
     },
     ],
   };
 
-  // Load portfolio history
+  // Load portfolio history with realistic data
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const history = await getPortfolioValueHistory();
-        setPortfolioHistory(cleanPortfolioValueHistory(history));
+        // Force realistic data generation
+        const { forceRebuildPortfolioHistory, rebuildPortfolioValueHistoryFromTrades } = await import('../utils/portfolio');
+        forceRebuildPortfolioHistory();
+        const realisticData = await rebuildPortfolioValueHistoryFromTrades();
+        setPortfolioHistory(cleanPortfolioValueHistory(realisticData));
       } catch (error) {
-        console.error('Failed to load portfolio history:', error);
+        console.error('Failed to load realistic portfolio history:', error);
+        // Fallback to existing data
+        try {
+          const history = await getPortfolioValueHistory();
+          setPortfolioHistory(cleanPortfolioValueHistory(history));
+        } catch (fallbackError) {
+          console.error('Fallback failed:', fallbackError);
+        }
       } finally {
         setHistoryLoading(false);
       }
@@ -470,26 +480,25 @@ const Dashboard: React.FC = () => {
 
               {/* Real-time Market News - Moved here from bottom */}
               <MotionCard
-                bg={cardBg}
-                boxShadow="lg"
+                className="terminal-card"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
               <CardBody>
                   <HStack justify="space-between" mb={4}>
-                    <Heading size="md" color={sectionTitleColor}>Market News</Heading>
+                    <Heading size="md" className="terminal-heading-accent">Market News</Heading>
                     <HStack spacing={2}>
-                      <TimeIcon color={accentColor} />
-                      <Text fontSize="sm" color={statLabelColor}>
-                        Last updated: {lastUpdate.toLocaleTimeString()}
+                      <TimeIcon className="terminal-text-dim" />
+                      <Text fontSize="sm" className="terminal-text-dim">
+                        LAST UPDATED: {lastUpdate.toLocaleTimeString().toUpperCase()}
                       </Text>
                     </HStack>
                   </HStack>
                 <VStack align="stretch" spacing={4}>
                     {marketNews.length === 0 ? (
-                      <Text color={statLabelColor} textAlign="center" py={4}>
-                        Loading news...
+                      <Text className="terminal-text-dim" textAlign="center" py={4}>
+                        LOADING MARKET DATA...
                       </Text>
                     ) : (
                       marketNews.map((news, index) => (
@@ -498,38 +507,37 @@ const Dashboard: React.FC = () => {
                         p={4}
                         borderWidth="1px"
                         borderRadius="lg"
-                        bg={newsCardBg}
+                        className="terminal-card"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
                         whileHover={{ scale: 1.02 }}
-                          _hover={{ boxShadow: 'md' }}
                         >
                           <VStack align="stretch" spacing={2}>
                             <HStack justify="space-between">
-                              <Badge colorScheme="blue" variant="subtle">
-                                {news.category}
+                              <Badge className="terminal-badge">
+                                {news.category.toUpperCase()}
                               </Badge>
-                              <Text fontSize="sm" color={statLabelColor}>
-                                {news.time}
+                              <Text fontSize="sm" className="terminal-text-dim">
+                                {news.time.toUpperCase()}
                               </Text>
                             </HStack>
-                            <Text fontWeight="medium" color={textColor}>
+                            <Text fontWeight="medium" className="terminal-text">
                               {news.title}
                             </Text>
                       <HStack justify="space-between">
-                          <Text fontSize="sm" color={statLabelColor}>
-                                {news.source}
+                          <Text fontSize="sm" className="terminal-text-dim">
+                                {news.source.toUpperCase()}
                         </Text>
                           <HStack spacing={2}>
                         <Badge
-                          colorScheme={news.sentiment === 'positive' ? 'green' : 'red'}
-                              variant="subtle"
+                          className="terminal-badge"
+                          color={news.sentiment === 'positive' ? 'terminal.success' : 'terminal.danger'}
                         >
-                          {news.sentiment}
+                          {news.sentiment.toUpperCase()}
                         </Badge>
-                            <Badge colorScheme="blue" variant="subtle">
-                              {news.impact} impact
+                            <Badge className="terminal-badge">
+                              {news.impact.toUpperCase()} IMPACT
                             </Badge>
                           </HStack>
                       </HStack>
@@ -548,34 +556,33 @@ const Dashboard: React.FC = () => {
             <VStack spacing={6} align="stretch">
             {/* Portfolio Summary */}
               <MotionCard
-                bg={cardBg}
-                boxShadow="lg"
+                className="terminal-card"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
               <CardBody>
-                  <Heading size="md" mb={4} color={sectionTitleColor}>Virtual Portfolio</Heading>
+                  <Heading size="md" mb={4} className="terminal-heading-accent">Virtual Portfolio</Heading>
                   <VStack align="stretch" spacing={4}>
                     <Stat>
-                      <StatLabel color={statLabelColor}>Total Value</StatLabel>
-                      <StatNumber color={statNumberColor}>${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</StatNumber>
+                      <StatLabel className="terminal-stat-label">TOTAL VALUE</StatLabel>
+                      <StatNumber className="terminal-stat-number">${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</StatNumber>
                     </Stat>
                     <Stat>
-                      <StatLabel color={statLabelColor}>Cash</StatLabel>
-                      <StatNumber color={statNumberColor}>${portfolio.cash.toLocaleString(undefined, { maximumFractionDigits: 2 })}</StatNumber>
+                      <StatLabel className="terminal-stat-label">CASH AVAILABLE</StatLabel>
+                      <StatNumber className="terminal-stat-number">${portfolio.cash.toLocaleString(undefined, { maximumFractionDigits: 2 })}</StatNumber>
                     </Stat>
                     <Box>
-                      <Heading size="sm" mb={2} color={statLabelColor}>Asset Allocation</Heading>
+                      <Heading size="sm" mb={2} className="terminal-stat-label">ASSET ALLOCATION</Heading>
                       <Pie data={allocationPieData} options={{ responsive: true, plugins: { legend: { position: 'bottom' } } }} />
                     </Box>
                     <Box>
-                      <Heading size="sm" mb={2} color={statLabelColor}>Gain/Loss by Holding</Heading>
+                      <Heading size="sm" mb={2} className="terminal-stat-label">GAIN/LOSS BY HOLDING</Heading>
                       <Bar data={gainLossBarData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
                           </Box>
                     <Box>
                       <Link to="/portfolio">
-                        <Button colorScheme="blue" variant="outline">View Full Portfolio</Button>
+                        <Button className="terminal-button" variant="outline">VIEW FULL PORTFOLIO</Button>
                       </Link>
                     </Box>
                 </VStack>
