@@ -17,8 +17,7 @@
  * @component
  */
 
-import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Input,
@@ -103,7 +102,6 @@ interface StockData {
 }
 
 const StockSearch: React.FC = () => {
-  const navigate = useNavigate();
   // State management
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<StockSearchResult[]>([]);
@@ -128,8 +126,8 @@ const StockSearch: React.FC = () => {
    * Debounced search function to prevent excessive API calls
    * Waits 300ms after the user stops typing before making the API request
    */
-  const searchStocks = useCallback(
-    debounce(async (query: string) => {
+  const searchStocks = useMemo(
+    () => debounce(async (query: string) => {
       if (!query.trim()) {
         setSearchResults([]);
         return;
@@ -179,7 +177,33 @@ const StockSearch: React.FC = () => {
    * @param {string} symbol - The stock symbol to fetch data for
    */
   const handleStockSelect = async (symbol: string) => {
-    navigate(`/stock/${symbol}`);
+    setIsLoadingStock(true);
+    setError(null);
+
+    try {
+      const response = await fetch(formatApiUrl(`/api/stocks/${symbol}`));
+      if (!response.ok) {
+        throw new Error(`Failed to load ${symbol}`);
+      }
+
+      const data = await response.json();
+      setSelectedStock({
+        symbol: data.symbol,
+        name: data.company_name || symbol,
+        price: data.current_price || 0,
+        change: data.change || 0,
+        changePercent: data.change_percent || 0,
+        volume: data.volume || 0,
+        marketCap: data.market_cap || 0,
+        technical_indicators: data.technical_indicators,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load stock details';
+      setError(message);
+      toast({ title: message, status: 'error' });
+    } finally {
+      setIsLoadingStock(false);
+    }
   };
 
   /**

@@ -29,10 +29,6 @@ module.exports = override(
         Buffer: ['buffer', 'Buffer'],
         process: ['process/browser.js'],
       }),
-      // Define process.env
-      new webpack.DefinePlugin({
-        'process.env': JSON.stringify(process.env),
-      }),
     ];
 
     // Ignore warnings about the process module

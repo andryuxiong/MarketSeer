@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, Table, Thead, Tbody, Tr, Th, Td, Button, Input, Select, VStack, HStack, useToast, Divider, Stat, StatLabel, StatNumber, StatHelpText, useColorModeValue, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
-import { getPortfolio, savePortfolio, tradeStock, resetPortfolio, Portfolio, Holding, Trade } from '../utils/portfolio';
+import { Box, Heading, Text, Table, Thead, Tbody, Tr, Th, Td, Button, Input, Select, VStack, HStack, useToast, Divider, Stat, StatLabel, StatNumber, StatHelpText, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
+import { getPortfolio, tradeStock, resetPortfolio, Portfolio } from '../utils/portfolio';
 import { Line, Pie, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -15,7 +15,7 @@ import {
   Legend,
 } from 'chart.js';
 import { getPortfolioValueHistory, cleanPortfolioValueHistory, PortfolioValuePoint } from '../utils/portfolio';
-import type { Chart, ChartTypeRegistry, ScriptableContext, ScriptableLineSegmentContext } from 'chart.js';
+import type { ScriptableLineSegmentContext } from 'chart.js';
 import { formatApiUrl } from '../config/api';
 
 ChartJS.register(
@@ -106,18 +106,6 @@ const PortfolioPage: React.FC = () => {
     setIsResetOpen(false);
   };
 
-  // Calculate holding value and gain/loss
-  const getHoldingStats = (holding: Holding) => {
-    // Find latest price for the symbol in portfolio (from backend)
-    const current = portfolio && portfolio.holdings.find(h => h.symbol === holding.symbol);
-    return fetchPrice(holding.symbol).then(currentPrice => {
-      const value = holding.shares * (currentPrice || holding.avg_price);
-      const gain = (currentPrice ? (currentPrice - holding.avg_price) : 0) * holding.shares;
-      const gainPercent = holding.avg_price ? (gain / (holding.avg_price * holding.shares)) * 100 : 0;
-      return { value, gain, gainPercent, currentPrice };
-    });
-  };
-
   // --- Chart Data Preparation ---
   const STARTING_CASH = 100000;
 
@@ -142,7 +130,6 @@ const PortfolioPage: React.FC = () => {
   };
 
   // Asset Allocation Pie Chart
-  const totalValue = portfolio.cash + portfolio.holdings.reduce((sum, h) => sum + h.shares * h.avg_price, 0);
   const pieLabels = [
     ...portfolio.holdings.map((h) => h.symbol),
     'Cash',

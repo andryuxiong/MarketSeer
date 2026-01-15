@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Spinner, Text, useToast } from '@chakra-ui/react';
 import { useColorModeValue } from '@chakra-ui/react';
 import Plotly, { Data } from 'plotly.js';
-import { API_ENDPOINTS, formatApiUrl } from '../../config/api';
+import { formatApiUrl } from '../../config/api';
 import { handleApiError, ApiError, shouldRetry, getRetryDelay } from '../../utils/errorHandling';
 import { HistoricalData } from '../../types/stock';
 

@@ -164,7 +164,8 @@ class StockService:
                     "volume": candles_data['v'][i]
                 })
             
-            # Calculate technical indicators
+            # Calculate technical indicators. Finnhub candle payloads are stored
+            # with API-style lowercase keys, while yfinance uses title case.
             df = pd.DataFrame(historical_data)
             technical_indicators = self._calculate_technical_indicators(df)
             
@@ -236,6 +237,10 @@ class StockService:
 
         """
         try:
+            hist = hist.copy()
+            if "Close" not in hist.columns and "close" in hist.columns:
+                hist["Close"] = hist["close"]
+
             # Calculate 20 and 50-day SMAs
             hist["SMA_20"] = hist["Close"].rolling(window=20).mean()
             hist["SMA_50"] = hist["Close"].rolling(window=50).mean()

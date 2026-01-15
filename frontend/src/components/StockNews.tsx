@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, VStack, HStack, Badge, Spinner, Link as ChakraLink, Progress, Tooltip, useColorModeValue, Skeleton } from '@chakra-ui/react';
+import { Box, Heading, Text, VStack, HStack, Badge, Spinner, Link as ChakraLink, Progress, Tooltip, useColorModeValue } from '@chakra-ui/react';
 import { formatApiUrl } from '../config/api';
-
-// Note: Use the Finnhub API key from environment variables
-const FINNHUB_API_KEY = process.env.REACT_APP_FINNHUB_API_KEY;
-
-if (!FINNHUB_API_KEY) {
-  console.error('Finnhub API key is not set in environment variables');
-}
 
 interface StockNewsProps {
   symbol: string;
@@ -157,8 +150,25 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
 
   const calculateSentimentFromNews = (articles: NewsItem[]): SentimentData => {
     const totalArticles = articles.length;
+    if (totalArticles === 0) {
+      return {
+        companyNewsScore: 0.5,
+        sectorAverageBullishPercent: 0.5,
+        sectorAverageNewsScore: 0.5,
+        buzz: {
+          articlesInLastWeek: 0,
+          buzz: 0,
+          weeklyAverage: 0
+        },
+        sentiment: {
+          bearishPercent: 0.5,
+          bullishPercent: 0.5
+        }
+      };
+    }
+
     const recentArticles = articles.filter(article => {
-      const articleDate = new Date(article.published_at);
+      const articleDate = new Date(article.published_at * 1000);
       const threeDaysAgo = new Date();
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
       return articleDate >= threeDaysAgo;
@@ -197,7 +207,7 @@ const StockNews: React.FC<StockNewsProps> = ({ symbol }) => {
       }
 
       // Apply recency weighting
-      const articleDate = new Date(article.published_at);
+      const articleDate = new Date(article.published_at * 1000);
       const now = new Date();
       const daysOld = (now.getTime() - articleDate.getTime()) / (1000 * 60 * 60 * 24);
       if (daysOld <= 1) {

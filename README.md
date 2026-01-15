@@ -61,8 +61,7 @@ uvicorn app.main:app --reload
 ### Frontend
 Create a `.env` file in the frontend directory:
 ```
-VITE_API_URL=http://localhost:8000
-VITE_FINNHUB_API_KEY=your_finnhub_api_key
+REACT_APP_API_URL=http://localhost:8000
 ```
 
 ### Backend

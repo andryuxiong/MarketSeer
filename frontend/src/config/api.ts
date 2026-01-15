@@ -1,7 +1,6 @@
 // API configuration for MarketSeer
 import axios from 'axios';
 import { handleApiError, shouldRetry, getRetryDelay } from '../utils/errorHandling';
-import { useToast } from '@chakra-ui/react';
 import { ApiError } from '../utils/errorHandling';
 
 // Validate environment variables and ensure consistent API URL usage

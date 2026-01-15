@@ -25,7 +25,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Spinner, Box, Text } from '@chakra-ui/react';
-import { API_BASE, formatApiUrl } from '../config/api';
+import { formatApiUrl } from '../config/api';
 
 ChartJS.register(
   CategoryScale,

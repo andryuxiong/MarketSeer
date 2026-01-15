@@ -16,24 +16,13 @@ import {
   VStack,
   HStack,
   Badge,
-  useColorModeValue,
-  Flex,
   Icon,
-  Progress,
   createIcon,
   Button,
   Spinner,
-  Container,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-  Tooltip,
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FiTrendingUp, FiTrendingDown, FiDollarSign, FiPercent, FiClock } from 'react-icons/fi';
 import { TimeIcon } from '@chakra-ui/icons';
-import StockChart from '../components/charts/StockChart';
 import { getPortfolio, getPortfolioValueHistory, updatePortfolioValueHistory, cleanPortfolioValueHistory, PortfolioValuePoint } from '../utils/portfolio';
 import { Link } from 'react-router-dom';
 import { Line, Pie, Bar } from 'react-chartjs-2';
@@ -48,7 +37,6 @@ import {
   ScriptableLineSegmentContext,
   Filler
 } from 'chart.js';
-import PortfolioChart from '../components/charts/PortfolioChart';
 import { formatApiUrl } from '../config/api';
 
 ChartJS.register(
@@ -87,9 +75,6 @@ const TrendingDownIcon = createIcon({
   ),
 });
 
-// Use Finnhub API key from environment variables
-const FINNHUB_API_KEY = process.env.REACT_APP_FINNHUB_API_KEY;
-
 interface NewsItem {
   title: string;
   source: string;
@@ -102,18 +87,11 @@ interface NewsItem {
 
 const Dashboard: React.FC = () => {
   const [portfolioHistory, setPortfolioHistory] = useState<PortfolioValuePoint[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(true);
+  const [, setHistoryLoading] = useState(true);
   
   // Terminal theme colors
-  const cardBg = 'terminal.surface';
-  const textColor = 'terminal.text';
-  const sectionTitleColor = 'terminal.primary';
-  const statNumberColor = 'terminal.text';
   const statLabelColor = 'terminal.textDim';
-  const accentColor = 'terminal.primary';
   const bgColor = 'terminal.bg';
-  const borderColor = 'terminal.border';
-  const newsCardBg = 'terminal.surfaceElevated';
   const upTrendColor = 'terminal.success';
   const downTrendColor = 'terminal.danger';
 
@@ -182,15 +160,16 @@ const Dashboard: React.FC = () => {
   
   // Calculate real-time holding stats
   const [holdingStats, setHoldingStats] = React.useState<any[]>([]);
-  const [holdingsLoading, setHoldingsLoading] = React.useState(true);
+  const [, setHoldingsLoading] = React.useState(true);
 
   React.useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
     const fetchHoldingStats = async () => {
+      const currentPortfolio = getPortfolio();
       try {
         setHoldingsLoading(true);
         const stats = await Promise.all(
-          portfolio.holdings.map(async (h) => {
+          currentPortfolio.holdings.map(async (h) => {
             const response = await fetch(formatApiUrl(`/api/stock/quote/${h.symbol}`));
             if (!response.ok) throw new Error(`Failed to fetch price for ${h.symbol}`);
             const data = await response.json();
@@ -212,7 +191,7 @@ const Dashboard: React.FC = () => {
       }
     };
 
-    if (portfolio.holdings.length > 0) {
+    if (getPortfolio().holdings.length > 0) {
       fetchHoldingStats(); // Fetch immediately on mount
       interval = setInterval(fetchHoldingStats, 30000); // Poll every 30 seconds
     } else {
@@ -221,11 +200,7 @@ const Dashboard: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [portfolio.holdings.length]);
-
-  // Sort for high/low tracker
-  const topHoldings = [...holdingStats].sort((a, b) => b.value - a.value).slice(0, 3);
-  const lowHoldings = [...holdingStats].sort((a, b) => a.value - b.value).slice(0, 3);
+  }, []);
 
   // Virtual Portfolio Asset Allocation Pie Chart
   const pieLabels = [
@@ -325,7 +300,6 @@ const Dashboard: React.FC = () => {
 
   // Real-time market news state
   const [marketNews, setMarketNews] = React.useState<NewsItem[]>([]);
-  const [isConnected, setIsConnected] = React.useState(false);
   const [lastUpdate, setLastUpdate] = React.useState<Date>(new Date());
   const [newsError, setNewsError] = React.useState<string>('');
 
